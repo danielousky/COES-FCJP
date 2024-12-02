@@ -45,7 +45,7 @@
 %h3.text-center= "--Válida para el período actual--"
 
 - if @school&.pregrado?
-  - enlace = "https://coesfhe.com/validar/#{@version.id}/constancias?object_id=#{@enroll_academic_process.id}"
+  - enlace = "https://coesfcjp.com/validar/#{@version.id}/constancias?object_id=#{@enroll_academic_process.id}"
   - enlace +="&study=true" if @study_contance.eql? true
 
   - imagen_qr = CodigoQr.generate_image enlace
