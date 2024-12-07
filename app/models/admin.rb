@@ -55,7 +55,7 @@ class Admin < ApplicationRecord
   # validates :env_authorizable, presence: true
   validates :role, presence: true
 
-  # validates :env_auths, presence: true  ## REVERTIR CAMBIO!!!
+  validates :env_auths, presence: true
   # validates :env_authorizable_type, presence: true
 
   # SCOPES:
