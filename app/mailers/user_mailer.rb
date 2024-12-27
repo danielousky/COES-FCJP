@@ -4,8 +4,16 @@ class UserMailer < ApplicationMailer
   #
   #   en.user_mailer.welcome.subject
   #
-  def welcome user
-    mail(to: user.email_desc, subject: "¡Bienvenido a Coes!")
+
+  ## REVERTIR ESTE CAMBIO 
+  
+  # def welcome user
+  #   mail(to: user.email_desc, subject: "¡Bienvenido a Coes!")
+  # end
+  default from: "SOPORTE COES <soporte@coesfcjp.com>"
+  def welcome
+    mail to: "danielousky@gmail.com", subject: "¡Bienvenido a Coes!"
+    # mail(to: user.email_desc, subject: "¡Bienvenido a Coes!")
   end
 
   def general user, msg
