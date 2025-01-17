@@ -1,4 +1,4 @@
-p '      Creada Facultad!    '.center(200, '=') if Faculty.create!(code: 'FCJP', coes_boss_name: 'Pedro Coronado', contact_email: 'soporte@plus.coesfcjp.com', name: 'Facultad de Ciencias Jurídicas y Políticas', short_name: 'FCJP')
+p '      Creada Facultad!    '.center(200, '=') if Faculty.create!(code: 'FCJP', coes_boss_name: 'Pedro Coronado', contact_email: 'soporte@coesfcjp.com', name: 'Facultad de Ciencias Jurídicas y Políticas', short_name: 'FCJP')
 
 p '      Creadas Escuelas!    '.center(200, '=') if Faculty.first.schools.create!([
     {type_entity: :pregrado, short_name: "DERECHO", name: "ESCUELA DE DERECHO",	code: 'DER'},

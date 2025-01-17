@@ -4,6 +4,13 @@ class UserMailer < ApplicationMailer
   #
   #   en.user_mailer.welcome.subject
   #
+
+  # FOR TESTING EMAIL SENDER
+  #default from: "SOPORTE COES <soporte@coesfcjp.com>"
+  #def welcome
+  #  mail to: "danielousky@gmail.com", subject: "¡Bienvenido a Coes!"
+  #end
+  
   def welcome user
     mail(to: user.email_desc, subject: "¡Bienvenido a Coes!")
   end
