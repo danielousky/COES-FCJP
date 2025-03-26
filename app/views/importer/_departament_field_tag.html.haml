@@ -1,0 +1,8 @@
+#area_field.control-group.row.mb-3.enum_type
+  %label.col-sm-2.col-form-label.text-md-end{for: "area_field"} Cátedra
+  .col-sm-10.controls
+    =# grouped_collection_select nil, :area_id, Departament.all.joins(:school).order('departaments.name': :asc, 'schools.name': :asc), :areas, :full_description, :id, :name, {prompt: "Seleccione Cátedra..."}, { class: "form-control"}  
+    - departaments = current_user&.admin.departaments
+    = select(nil, :departament_id, departaments.collect{|o| [ o.full_description, o.id ] }, { include_blank: 'Seleccione Departamento...', selected: @departament_id}, {class: "form-control ra-filtering-select-input ui-autocomplete-input", required: true})
+    .form-text
+      %span.label.label-danger Requerida

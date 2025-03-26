@@ -1,8 +1,6 @@
 #area_field.control-group.row.mb-3.enum_type
   %label.col-sm-2.col-form-label.text-md-end{for: "area_field"} Cátedra
   .col-sm-10.controls
-    = grouped_collection_select nil, :area_id, Departament.all.joins(:school).order('departaments.name': :asc, 'schools.name': :asc), :areas, :full_description, :id, :name, {prompt: "Seleccione Cátedra..."}, { class: "form-control"}  
-    
-    =# select(nil, :area_id, Area.all.collect{|o| [ o.description, o.id ] }, { include_blank: 'Seleccione Cátedra...', selected: @area_id}, {class: "form-control ra-filtering-select-input ui-autocomplete-input", required: true})
+    = grouped_collection_select nil, :area_id, Area.all.joins(:school).order('areas.name': :asc, 'schools.name': :asc), :areas, :full_description, :id, :name, {prompt: "Seleccione Cátedra..."}, { class: "form-control"}
     .form-text
       %span.label.label-danger Requerida

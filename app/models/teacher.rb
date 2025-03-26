@@ -222,7 +222,7 @@ class Teacher < ApplicationRecord
 
     total_newed = total_updated = 0
     no_registred = ""
-    if area = Area.find(fields['area_id'])
+    if departament = Departament.find(fields['departament_id'])
 
       if row[0]
         row[0].strip!
@@ -268,7 +268,7 @@ class Teacher < ApplicationRecord
 
       if usuario.save 
         profesor = Teacher.find_or_initialize_by(user_id: usuario.id)
-        profesor.area_id = area.id
+        profesor.departament_id = departament.id
 
         nuevo = profesor.new_record?
 
@@ -282,11 +282,11 @@ class Teacher < ApplicationRecord
           no_registred = row
         end
       else
-        p "     #{usuario.errors.full_messages.to_sentence  } ... #{usuario.attributes}   ".center(500, "$")
+        # p "     #{usuario.errors.full_messages.to_sentence  } ... #{usuario.attributes}   ".center(500, "$")
         no_registred = row
       end
     else
-        no_registred = 'Área no encontrada'
+        no_registred = 'Departamento no encontrada'
     end
     [total_newed, total_updated, no_registred]    
   end
