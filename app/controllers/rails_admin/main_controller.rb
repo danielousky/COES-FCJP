@@ -32,7 +32,7 @@ module RailsAdmin
           else
             schoolables = ['Subject', 'Teacher', 'StudyPlan', 'Departament', 'AcademicProcess', 'EnrollAcademicProcess', 'PaymentReport', 'Grade', 'Area', 'Section', 'Course', 'AcademicRecord']
           end
-          schoolables.delete 'Teacher' if (session[:env_type]&.to_s.eql? 'School' and session[:env_ids].include? 11)
+          # schoolables.delete 'Teacher' if (session[:env_type]&.to_s.eql? 'School' and session[:env_ids].include? 11)
           departamentables = ['Teacher', 'Area', 'Section']
           if session[:env_type]&.to_s.eql? 'Departament'
             if departamentables.include? @abstract_model.to_s
