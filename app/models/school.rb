@@ -46,13 +46,15 @@ class School < ApplicationRecord
 
   belongs_to :faculty
 
-  has_many :admission_types
-  accepts_nested_attributes_for :admission_types
-
+  
+  # Atención: La admission_type no está asociada a la escuela, no bebería ir la línea de abajo
+  # has_many :admission_types
+  # accepts_nested_attributes_for :admission_types
+  
   has_many :academic_processes
   has_many :departaments, dependent: :destroy
   accepts_nested_attributes_for :departaments, allow_destroy: true
-  
+    
   has_many :areas
   has_many :study_plans, dependent: :destroy
   accepts_nested_attributes_for :study_plans, allow_destroy: true
