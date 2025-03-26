@@ -58,7 +58,7 @@ class AcademicProcessesController < ApplicationController
   def run_regulation
     total_actualizados = 0
     total_error = 0
-    EnrollmentDay.destroy_all
+    @academic_process.school.enrollment_days.each{|ed| ed.destroy}
     @academic_process.enroll_academic_processes.each do |iep|
 
       grade = iep.grade

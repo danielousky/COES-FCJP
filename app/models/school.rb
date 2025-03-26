@@ -54,7 +54,9 @@ class School < ApplicationRecord
   has_many :academic_processes
   has_many :departaments, dependent: :destroy
   accepts_nested_attributes_for :departaments, allow_destroy: true
-    
+  
+  has_many :enrollment_days, through: :academic_processes
+  
   has_many :areas
   has_many :study_plans, dependent: :destroy
   accepts_nested_attributes_for :study_plans, allow_destroy: true
