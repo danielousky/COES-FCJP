@@ -155,11 +155,8 @@ class StudyPlan < ApplicationRecord
         partial 'study_plan/custom_modality_field'
         help 'Atención: la opción indicada servirá adicionalemnte para la inscripción de los estudiantes.'        
       end
-      field :structure do
-        partial 'study_plan/custom_structure_field'
-        help 'Atención: la opción indicada servirá adicionalemnte para la inscripción de los estudiantes.'
-      end
-      fields :levels, :requirement_by_subject_types, :mentions
+
+      fields :levels, :requirement_by_subject_types#, :mentions
 
     end
 		update do
