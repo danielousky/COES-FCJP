@@ -5,13 +5,13 @@ module SubjectLinksHelper
 
 	def badge_tipo_subject(asignatura)
 		capture_haml do
-			"<span class='badge bg-info tooltip-btn'>#{asignatura.subject_type&.name&.titleize}</span>".html_safe
+			"<span class='badge bg-info tooltip-btn text-dark'>#{asignatura.subject_type&.name&.titleize}</span>".html_safe
 		end
 	end
 
 	def badge_level_subject(asignatura)
 		capture_haml do
-			"<span class='badge bg-info tooltip-btn' data-toggle='tooltip' title= 'Año/Semestre'>#{asignatura.ordinal}</span>".html_safe
+			"<span class='badge bg-info tooltip-btn text-dark' data-bs-toggle='tooltip' title= 'Año/Semestre'>#{asignatura.ordinal}</span>".html_safe
 		end
 	end
 

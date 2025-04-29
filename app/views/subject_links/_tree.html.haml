@@ -5,7 +5,7 @@
         - aprobada = (@aprobadas_ids&.include? dep.asignatura_id) ? 'table-success' : ''
         %tr{class: aprobada, id: "dep#{dep.id}"}
           %th.py-1.px-2
-            - if !(aprobada.eql? '')
+            - if !aprobada.empty?
               %i.fa.fa-check.text-success{'data-bs-toggle': :tooltip, title: 'Aprobada'}
 
             - if adelante 
