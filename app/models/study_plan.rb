@@ -156,7 +156,7 @@ class StudyPlan < ApplicationRecord
         help 'Atención: la opción indicada servirá adicionalemnte para la inscripción de los estudiantes.'        
       end
 
-      fields :levels, :requirement_by_subject_types#, :mentions
+      fields :levels, :requirement_by_subject_types, :structure#, :mentions
 
     end
 		update do
