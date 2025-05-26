@@ -470,9 +470,9 @@ class AcademicProcess < ApplicationRecord
           user = bindings[:view]._current_user
           if (user&.admin&.authorized_read? 'Section')
 
-            %{<a href='/admin/section?f%5Bacademic_process%5D%5B83223%5D%5Bo%5D=like&f%5Bacademic_process%5D%5B83223%5D%5Bv%5D=#{bindings[:object].process_name}&f%5Bschool%5D%5B96616%5D%5Bo%5D=like&f%5Bschool%5D%5B96616%5D%5Bv%5D=#{bindings[:object].school.short_name}' data-bs-toggle = 'tooltip', title='Total Secciones'><span class='badge bg-info'>#{value} en #{bindings[:object].courses.count} Cursos</span></a> #{bindings[:object].link_to_massive_actas_generation if bindings[:object].sections.qualified.any?}}.html_safe
+            %{<a href='/admin/section?f%5Bacademic_process%5D%5B83223%5D%5Bo%5D=like&f%5Bacademic_process%5D%5B83223%5D%5Bv%5D=#{bindings[:object].process_name}&f%5Bschool%5D%5B96616%5D%5Bo%5D=like&f%5Bschool%5D%5B96616%5D%5Bv%5D=#{bindings[:object].school.short_name}' data-bs-toggle = 'tooltip', title='Total Secciones'><span class='text-dark badge bg-info'>#{value} en #{bindings[:object].courses.count} Cursos</span></a> #{bindings[:object].link_to_massive_actas_generation if bindings[:object].sections.qualified.any?}}.html_safe
           else
-            %{<span class='badge bg-info'>#{value}</span>}.html_safe
+            %{<span class='text-dark badge bg-info'>#{value}</span>}.html_safe
           end
         end
       end
