@@ -22,6 +22,12 @@ class PartialQualification < ApplicationRecord
   # ASSOCIATIONS:
   belongs_to :academic_record
 
+  has_paper_trail on: [:create, :destroy, :update]
+  
+  before_create :paper_trail_create
+  before_destroy :paper_trail_destroy
+  before_update :paper_trail_update
+
   # VALIDATIONS:
   validates :academic_record, presence: true
   validates :value, presence: true, numericality: { in: 0..20, message: 'El número debe estar entre 0 y 20' }
@@ -49,5 +55,23 @@ class PartialQualification < ApplicationRecord
       self.academic_record.qualifications.create!(type_q: :final, value: total, definitive: true)
     end
   end
+
+  private
+
+  def paper_trail_update
+    changed_fields = self.changes.keys - ['created_at', 'updated_at']
+    object = I18n.t("activerecord.models.#{self.model_name.param_key}.one")
+    self.paper_trail_event = "¡#{object} actualizado en #{changed_fields.to_sentence}"
+  end  
+
+  def paper_trail_create
+    object = I18n.t("activerecord.models.#{self.model_name.param_key}.one")
+    self.paper_trail_event = "¡Completada inscripción en Curso!"
+  end  
+
+  def paper_trail_destroy
+    object = I18n.t("activerecord.models.#{self.model_name.param_key}.one")
+    self.paper_trail_event = "¡Registro Académico eliminado!"
+  end  
 
 end
