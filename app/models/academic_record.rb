@@ -23,7 +23,7 @@
 class AcademicRecord < ApplicationRecord
 
   # ENUMERIZE:
-  enum status: {sin_calificar: 0, aprobado: 1, aplazado: 2, retirado: 3, perdida_por_inasistencia: 4}
+  enum status: {sin_calificar: 0, aprobado: 1, aplazado: 2, retirado: 3, perdida_por_inasistencia: 4, no_presento: 5}
 
   # ASSOCIATIONS:
   belongs_to :section

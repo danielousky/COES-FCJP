@@ -5,6 +5,12 @@
 - @academic_process = section.academic_process
 - if !enabled_to_admin and teacher_authorized_to_qualify
   %h5.alert.alert-success.text-center Autorizado para Calificar
+
+%p.alert.alert-danger.text-justify
+  %b Atención:
+  Calificar es un proceso unitario, por lo que cada registro será guardado mientras se esté realizando la calificación en sí. Al completar cada carga correctamente, deberá aparecer un mensaje de color verde en la esquina superior derecha de la pantalla indicando que los datos fueron guardados con éxito. Del mismo modo, se deberá actualizarse el estado final de la calificación. De no ser así, por favor verifique su conexión a Internet, refresque la pantalla e inténtelo nuevamente. Finalmente, puede hacer clic en el botón 
+  %b Finalizar Calificación
+  para completar la acción general.
 .table-responsive
   %table.table.table-condensed.table-striped.table-hover.border.table-bordered.table-sm.border-success
     %thead
@@ -25,7 +31,11 @@
             - if section&.school&.have_partial_qualification?
               - colspan += 3
               - PartialQualification.partials.map do |ord|
-                %th.text-center= ord[0]&.titleize
+                %th.text-center
+                  =# ord[0]&.titleize
+                  = I18n.t("activerecord.models.partial_qualification.#{ord[0]}")
+                  %label.badge.bg-dark
+                    = "#{section.school&.get_percent_partial ord[0]}%"
             - if (admin_authorized_to_qualify or teacher_authorized_to_qualify)
               %th.text-center PI
             %th.text-center{'data-bs-toggle': :tooltip, title: 'Calificación Final'} Final
@@ -290,7 +300,17 @@
 
     let final = $(`#acRe${ar_id} .final`);
     final.val(null);
-    final.prop('disabled', false);
+
+    partials = $(`.partialsFor${ar_id}`);
+    if (partials.length > 0){
+      $(`#qualification_final_${ar_id}`).val(null);
+      partials.val(null);
+      partials.prop('disabled', false);
+    } else {
+      final.prop('disabled', false);
+    }
+
+
 
     numero_a_letras(undefined, ar_id);
     // $(`#[${ar_id}][qualification]pi`).prop('checked', false);
@@ -301,16 +321,25 @@
   } 
 
   function desactivar_por_pi(obj, ar_id){
-    var inputs, valor_checked;
+    var inputs, valor_checked, partials;
 
     inputs = $(`#acRe${ar_id} .qualifiable`);
     valor_checked = $(obj).prop('checked');
+    partials = $(`.partialsFor${ar_id}`);
+    if (partials.length > 0){
+      $(`#qualification_final_${ar_id}`).val(null);
+      partials.val(null);
+      partials.prop('disabled', valor_checked);
+    } else {
+      inputs.prop('disabled', valor_checked);
+    }
+
     inputs.val(null);
 
     let checkboxs = $(`#acRe${ar_id} .checkPost`);
     let posts = $(`#acRe${ar_id} .post`);
 
-    inputs.prop('disabled', valor_checked);
+    
     $(obj).prop('disabled', false);
 
     checkboxs.prop('checked', false);

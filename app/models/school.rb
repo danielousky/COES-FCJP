@@ -126,6 +126,14 @@ class School < ApplicationRecord
     end
   end
 
+  def get_percent_partial lapso
+    if (lapso.eql? 'primer_lapso') or (lapso.eql? 'segundo_lapso')
+      30
+    else
+      40
+    end
+  end
+
 
   def enroll_period_name
     self.enroll_process ? self.enroll_process.name : 'Inscripción Cerrada'

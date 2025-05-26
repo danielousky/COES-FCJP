@@ -21,6 +21,9 @@ es:
   perdida_por_inasistencia: PI
   PI: perdida_por_inasistencia
 
+  NP: no_presento
+  no_presento: NP
+
   EQ: equivalencia_externa
 
   equivalencia_externa: EE
@@ -495,7 +498,11 @@ es:
         other: Idiomas
       mention:
         one: Mención
-        other: Menciones        
+        other: Menciones
+      partial_qualification:
+        primer_lapso: '1er. Lapso'
+        segundo_lapso: '2do. Lapso'
+        tercer_lapso: '3er. Lapso'
       payment_report:
         one: 'Reporte de Pago'
         other: 'Reportes de Pago'
@@ -924,6 +931,7 @@ es:
         AP: aplazado
         RE: retirado
         PI: perdida_por_inasistencia
+        NP: No Presentó
 
         sin_calificar: 'Sin Calificar'
         sc: 'Sin Calificar'
@@ -947,6 +955,7 @@ es:
         nr: 'Reparación'
         perdida_por_inasistencia: 'Pérdida por Inasistencia'
         pi: 'Pérdida por Inasistencia'
+        np: 'No Presentó'
         parcial: 'Parciales'
         par: 'Parciales'
       qualification:

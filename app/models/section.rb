@@ -99,7 +99,7 @@ class Section < ApplicationRecord
   validates :qualified, inclusion: { in: [ true, false ] }
 
   #CALLBACKS
-  before_save :set_code_to_02i
+  # before_save :set_code_to_02i
   after_save :update_academic_records
 
   
@@ -764,15 +764,15 @@ class Section < ApplicationRecord
     [total_newed, total_updated, no_registred]
   end
 
-  def set_code_to_02i
-    self.code&.upcase!
-    begin
-      aux = sprintf("%02i", self.code)
-      self.code = aux
-    rescue Exception => e
+  # def set_code_to_02i
+  #   self.code&.upcase!
+  #   begin
+  #     aux = sprintf("%02i", self.code)
+  #     self.code = aux
+  #   rescue Exception => e
 
-    end
-  end
+  #   end
+  # end
 
   def update_academic_records
     if self.any_equivalencia?
