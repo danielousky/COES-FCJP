@@ -1,4 +1,8 @@
 -# frozen_string_literal: true
+- # ATENCIÓN: ESTA FALTANDO ACTUALIZAR LOS VALORES DE LOS GRADOS 
+- # Y LANZAR ESTE FORMULARIO SI PROCESO ACADEMICO DE INCIO O ADMISSION_TYPE SON NIL
+- # Ó SI EL ADMISSITON_TYPE ES '0001' (Desconocida)
+- # Estudiante: 31985406 
 = render partial: 'layouts/progress_wizard', locals: {active: 3}
 
 .vh-100.d-flex.justify-content-center
@@ -53,7 +57,31 @@
           = f.input :grade_title 
           = f.input :grade_university 
           = f.input :graduate_year, input_html: {value: Time.now.year, min: Time.now.year - 50, step: 1, max: Time.now.year} 
+          
         %hr
+        -# Formulario para actualizar admission_type y start_process para todos los grades que lo requieran
+        - if @student.grades.present?
+          - @student.grades.select{ |grade| grade.admission_type.nil? || grade.start_process.nil? || grade.admission_type&.code == '0001'}.each do |grade|
+            .mb-3
+              %h6.bg-info.mt-3.p-3.text-center
+                Actualiza tu tipo de admisión y fecha de inicio de proceso para la
+                = grade.school&.name&.presence || "Sin título"
+              = f.fields_for :grades, grade do |g|
+                = g.hidden_field :id
+                =# g.input :admission_type, collection: AdmissionType.where.not(code: '0001').map { |at| [at.name&.titleize, at.id] }, input_html: {prompt: 'Seleccione tipo de admisión', selected: grade.admission_type_id}
+                = g.select(:admission_type_id, AdmissionType.where.not(code: '0001').map { |at| [at.name&.titleize, at.id] }, {include_blank: 'Selecciona tipo de admisión...'}, {class: "form-control required", required: true})
+                -# Si el grade.admission_type_id es '0001' (Admisión Libre), se envía el mensaje de indicando que debe actualizarse
+                - if grade.admission_type&.code == '0001'
+
+                  %div.alert.alert-danger.mt-0
+                    %strong Atención:
+                    = "Debes indicar el tipo de admisión para continuar con el registro."
+
+                =# g.input :start_process, collection: grade.school.academic_processes.map{|ap|[ap.name_without_school, ap.id]}, input_html: {prompt: 'Seleccione Período'}, selected: grade.start_process_id
+                = g.select(:start_process_id, grade.school.academic_processes.map{|ap|[ap.name_without_school, ap.id]}, { include_blank: 'Selecciona Período que ingresó...'}, {class: "form-control required", required: true})
+
+        %hr
+
         = link_to 'Atrás', edit_user_path(current_student), class: 'btn btn-secondary'
         = f.submit 'Siguiente', class: 'btn btn-primary float-end', disable_with: 'Cargando...'
         %br

@@ -26,7 +26,16 @@
         
         - # Emails:
         %div{'data-bs-toggle': :tooltip, title: 'Atención: Recuerde que el correo electrónico es el medio principal de comunicación para COES, complételo de manera correcta.'}
-          = f.input :email, required: true
+          - # Si validacón falla por correo electronico temporal (mailinator), indicar al usuario
+
+          - invalid_class = @user.false_email? ? 'is-invalid' : ''
+          = f.input :email, required: true, input_html: {class: invalid_class}
+          - if @user.false_email?
+            %div.alert.alert-danger.mt-0
+              %strong Atención:
+              El correo electrónico ingresado es temporal, por favor ingrese un correo electrónico válido.
+
+
         - # Phone
         = f.input :number_phone, required: true, input_html: {class: 'upcase', oninput: "$(this).val($(this).val().replace(/[^0-9]/g,''));"}
 

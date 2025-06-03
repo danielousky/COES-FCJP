@@ -58,7 +58,7 @@ class Student < ApplicationRecord
   accepts_nested_attributes_for :address
   # has_many
   has_many :grades, dependent: :destroy
-  accepts_nested_attributes_for :grades, reject_if: proc { |attributes| attributes['study_plan_id'].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :grades, reject_if: proc { |attributes| attributes['id'].blank? && attributes['study_plan_id'].blank? }, allow_destroy: true
 # creates avatar_attributes=
 
   has_many :study_plans, through: :grades
