@@ -3,15 +3,4 @@
     = link_to "/admin/student/#{@object.student_id}", 'data-bs-toggle': :tooltip, title: 'Volver el detalle del estudiante', class: 'btn btn-info float-start' do
         %i.fa-solid.fa-chevron-left
 
-    - if (session[:rol]&.eql? 'admin' and current_user&.admin&.authorized_manage? 'Grade')
-
-        - if con_inscripciones
-            = link_to "/grades/#{@object.id}/import_inscripciones", 'data-bs-toggle': :tooltip, title: 'IMPORTAR REGISTROS', class: 'btn btn-success float-end' do
-                %i.fa-solid.fa-download
-                Importar de COES v1
-
-    %h5.bg-light.text-center.p-2.mb-3=@object.name
-    - if con_inscripciones
-        = render partial: '/grades/old_inscripcion_coes_index', locals: {inscripciones: @object.grado&.inscripciones}
-    - else
-        %p.text-center.alert.alert-warning Sin Inscriciones en COES V1        
+    %h5.bg-light.text-center.p-2.mb-3=@object.name 

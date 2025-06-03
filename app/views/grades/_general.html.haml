@@ -11,8 +11,6 @@
 			%th.text-center Cita horaria
 			- if (session[:rol].eql? 'admin' and (current_user&.admin&.authorized_update? 'Grade'))
 				%th
-			- if (session[:rol].eql? 'admin' and (current_user&.admin&.authorized_read? 'Grade'))
-				%th Coes v1
 
 		%tr
 			%td.text-center= @grade.label_start_process
@@ -26,6 +24,3 @@
 			%td.text-center= @grade.label_cita_horaria
 			- if (session[:rol].eql? 'admin' and (current_user&.admin&.authorized_update? 'Grade'))
 				%td.text-center
-			- if (session[:rol].eql? 'admin' and (current_user&.admin&.authorized_read? 'Grade'))
-				%td.text-center
-					= label_link_with_tooptip("/admin/grade/#{@grade.id}/old_inscripcion_coes", 'bg-warning', "<i class='fa fa-list'></i><i class='fa fa-signature'></i>", 'Ver datos en Coes v1', placement='top')				

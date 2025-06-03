@@ -214,24 +214,6 @@ class EnrollAcademicProcess < ApplicationRecord
     process_before_id ? grade.enroll_academic_processes.where(academic_process_id: process_before_id).first : nil
   end
 
-  # ------------- BORRAR -------------- # 
-  # Traido de COES V1
-  # reglamento_aux = :regular
-  # if inscribio_pero_no_aprobo_ninguna?
-  #   reglamento_aux = :articulo_3
-  #   iep_anterior = self.anterior_iep
-  #   if iep_anterior and iep_anterior.inscribio_pero_no_aprobo_ninguna?
-  #     reglamento_aux = :articulo_6
-  #     iep_anterior2 = iep_anterior.anterior_iep
-  #     if iep_anterior2 and iep_anterior2.inscribio_pero_no_aprobo_ninguna?
-  #       reglamento_aux = :articulo_7
-  #     end
-  #   end
-  # end
-  # return reglamento_aux
-
-  # ------------- BORRAR -------------- # 
-
   def not_pass_any?
     (academic_records.any? and !academic_records.aprobado.any?)
   end
