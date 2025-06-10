@@ -1,5 +1,5 @@
 - admin = current_user&.admin
-- if session[:rol].eql? 'student' or (session[:rol].eql? 'admin' and admin&.authorized_read? 'Grade')
+- if false #session[:rol].eql? 'student' or (session[:rol].eql? 'admin' and admin&.authorized_read? 'Grade')
 	= link_to "/grades/#{@grade.id}/kardex.pdf", class: 'btn btn-success float-end mb-3', target: '_blank', rel: "noopener noreferrer" do
 		.fa.fa-download.fa-list
 		Kardex PDF

@@ -30,27 +30,27 @@
 
   - if (enroll_academic_process&.academic_process&.active_or_enroll?) and enroll_academic_process.confirmado?
 
-    - if !enroll_academic_process.any_permanence_articulo?
-      - msg = 'Generar Constancia de Estudio'
-      = link_to "/enroll_academic_processes/#{enroll_academic_process.id}.pdf?study='true'", class: 'btn btn-info btn-sm float-end mx-1 align-middle', target: '_blank', rel: "noopener noreferrer", 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
+    - if false
+      - if !enroll_academic_process.any_permanence_articulo?
+        - msg = 'Generar Constancia de Estudio'
+        = link_to "/enroll_academic_processes/#{enroll_academic_process.id}.pdf?study='true'", class: 'btn btn-info btn-sm float-end mx-1 align-middle', target: '_blank', rel: "noopener noreferrer", 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
+          .fa.fa-download
+          .fa-solid.fa-graduation-cap
+          .fa-solid.fa-e
+
+      - else 
+        - msg = "No se puede generar la constancia de Estudio. Condición de permanencia: #{enroll_academic_process.permanence_status.titleize}"
+        = link_to 'javascript:void(0)', class: 'btn btn-secondary btn-sm float-end align-middle', 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
+          .fa.fa-download
+          .fa-solid.fa-graduation-cap
+          .fa-solid.fa-e
+
+    - if false
+      - msg = 'Generar Constancia de Inscripción'
+      = link_to "/enroll_academic_processes/#{enroll_academic_process.id}.pdf", class: 'btn btn-info btn-sm float-end mx-1 align-middle', target: '_blank', rel: "noopener noreferrer", 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
         .fa.fa-download
         .fa-solid.fa-graduation-cap
-        .fa-solid.fa-e
-
-    - else 
-      - msg = "No se puede generar la constancia de Estudio. Condición de permanencia: #{enroll_academic_process.permanence_status.titleize}"
-      = link_to 'javascript:void(0)', class: 'btn btn-secondary btn-sm float-end align-middle', 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
-        .fa.fa-download
-        .fa-solid.fa-graduation-cap
-        .fa-solid.fa-e
-
-
-    - msg = 'Generar Constancia de Inscripción'
-
-    = link_to "/enroll_academic_processes/#{enroll_academic_process.id}.pdf", class: 'btn btn-info btn-sm float-end mx-1 align-middle', target: '_blank', rel: "noopener noreferrer", 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
-      .fa.fa-download
-      .fa-solid.fa-graduation-cap
-        .fa-solid.fa-i
+          .fa-solid.fa-i
 
   - elsif enabled_to_admin
 
