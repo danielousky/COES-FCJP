@@ -40,7 +40,9 @@
         = f.input :number_phone, required: true, input_html: {class: 'upcase', oninput: "$(this).val($(this).val().replace(/[^0-9]/g,''));"}
 
         %hr
-        = link_to 'Atrás', edit_images_user_path(current_student), class: 'btn btn-secondary'
+        
+        = link_to 'Atrás', edit_images_user_path(current_user), class: 'btn btn-secondary'
+
         = f.submit 'Siguiente', class: 'btn btn-primary float-end', disable_with: 'Cargando...'
         %br
         %br

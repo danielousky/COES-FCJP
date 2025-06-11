@@ -1,24 +1,21 @@
+- secciones_main = current_teacher.sections.sort_by_period_reverse
+- secciones_secondary = current_teacher.secondary_sections.sort_by_period_reverse
 .justify-content-center
   = render 'layouts/main_banner'
-
 
   .nav.nav-tabs{role: "tablist"}
     .nav-item{role: "presentation"}
       = link_to 'Secciones Asignadas', "#", class: "nav-link active", id: "TabPrincipal", "aria-controls": "ContentPrincipal", "aria-selected": true, "data-bs-target": "#ContentPrincipal", "data-bs-toggle": :tab, role: :tab
-    .nav-item{role: "presentation"}
-      = link_to 'Secciones Cómo Secundario', "#", class: "nav-link", id: "TabSecundario", "aria-controls": "ContentSecundario", "aria-selected": true, "data-bs-target": "#ContentSecundario", "data-bs-toggle": :tab, role: :tab
+    - if secciones_secondary.any?
+      .nav-item{role: "presentation"}
+        = link_to 'Secciones Cómo Secundario', "#", class: "nav-link", id: "TabSecundario", "aria-controls": "ContentSecundario", "aria-selected": true, "data-bs-target": "#ContentSecundario", "data-bs-toggle": :tab, role: :tab
 
   .tab-content
     .tab-pane.fade.p-3{id: "ContentPrincipal", "aria-labelledby": "#TabPrincipal", role: "tabpanel", class: "active show"}
-      - secciones = current_teacher.sections.sort_by_period_reverse
-      - if secciones.any?
-        = render partial: '/teachers/index_sections', locals: {sections: secciones, teacher_session: true}
+      - if secciones_main.any?
+        = render partial: '/teachers/index_sections', locals: {sections: secciones_main, teacher_session: true}
       - else
         .alert.alert-warning Sin Secciones Asignadas
-    .tab-pane.fade.p-3{id: "ContentSecundario", "aria-labelledby": "#TabSecundario", role: "tabpanel"}
-      
-      - secciones = current_teacher.secondary_sections.sort_by_period_reverse
-      - if secciones.any?
+    - if secciones_secondary.any?
+      .tab-pane.fade.p-3{id: "ContentSecundario", "aria-labelledby": "#TabSecundario", role: "tabpanel"}
         = render partial: '/teachers/index_sections', locals: {sections: secciones, teacher_session: true}
-      - else
-        .alert.alert-warning Sin Secciones Secundarias Asignadas

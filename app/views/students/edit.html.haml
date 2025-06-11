@@ -60,7 +60,7 @@
           - @student.grades.select{ |grade| grade.admission_type.nil? || grade.start_process.nil? || grade.admission_type&.code == '0001'}.each do |grade|
             .mb-3
               %h6.bg-info.mt-3.p-3.text-center
-                Actualiza tu tipo de admisión y fecha de inicio de proceso para la
+                Actualiza tu tipo de admisión y período de ingreso a la
                 = grade.school&.name&.presence || "Sin título"
               = f.fields_for :grades, grade do |g|
                 = g.hidden_field :id
