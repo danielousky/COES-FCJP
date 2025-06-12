@@ -119,7 +119,7 @@ class User < ApplicationRecord
 
   before_validation(on: :create) do
     self.password ||= self.ci #if self.password.blank?
-    self.email = "actualizar-correo#{us.ci}@mailinator.com" if self.email.blank? and attribute_present?("ci")
+    self.email = "actualizar-correo#{self.ci}@mailinator.com" if self.email.blank? and attribute_present?("ci")
     
   end
 
