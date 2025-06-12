@@ -61,7 +61,7 @@ namespace :import do
         end
 
         # Buscar subject
-        subject = Subject.where(code: subject_code).or(Subject.where(code: '0#{subject_code}')).first
+        subject = Subject.where(code: subject_code).or(Subject.where(code: "0#{subject_code}")).first
         unless subject
 
           puts "Subject no encontrado: (#{subject_code})"
