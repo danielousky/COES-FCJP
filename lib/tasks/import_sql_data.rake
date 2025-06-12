@@ -1,8 +1,9 @@
 namespace :import do
   desc "Importa datos desde archivo SQL"
   task sql_data: :environment do
+    # Correr antes la tarea: rake import:sections_from_sql
     require 'open-uri'
-  require 'i18n'
+    require 'i18n'
 
     file_path = 'https://coesfcjp-space.nyc3.cdn.digitaloceanspaces.com/uxxi_reg_2024_2025%20-%208%20Mayo%202025.sql'
     table_name = nil
@@ -16,10 +17,19 @@ namespace :import do
   total_grados_no_encontrados = 0
 
   # Busco el AcademicProcess
-  ap = AcademicProcess.find 10
+  # Atención: El AcademicProcess está seteado a 10. Para estudios políticos debe ser diferente 
+  
+  puts "Ingrese el ID del AcademicProcess a utilizar:"
+  # ap = AcademicProcess.find(10)
+  ap_id = STDIN.gets.chomp.to_i
+  ap = AcademicProcess.find(ap_id)
 
   # Busco el Plan de Estudio
-  plan = StudyPlan.where(code: 'D002').first
+  # Atención: Del mismo modo que el AcademicProcess, el Plan de Estudio debe ser diferente para estudios políticos
+  # plan = StudyPlan.where(code: 'D002').first
+  puts "Ingrese el código del StudyPlan a utilizar:"
+  plan_code = STDIN.gets.chomp
+  plan = StudyPlan.where(code: plan_code).first
 
   URI.open(file_path) do |f|
     f.each_line do |line|
