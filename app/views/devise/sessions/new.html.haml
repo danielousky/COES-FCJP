@@ -32,6 +32,8 @@
           %span.input-group-text.bg-light.border-0.text-secondary
             %i.fas.fa-lock
           %input#inputPassword5.form-control.border-0.bg-light.rounded-0.ps-1{placeholder: "Contraseña", type: :password, name: 'user[password]', required: true}
+          %button.btn.btn-outline-secondary{type: "button", onclick: "togglePassword()", tabindex: "-1"}
+            %i.fas.fa-eye{:id => "togglePasswordIcon"}
       / Check box
 
       - if devise_mapping.rememberable?
@@ -46,3 +48,18 @@
       .mt-4.text-center.mb-4        
         .text-primary-hover
           = link_to "Recuperar contraseña", new_user_password_path, class: 'btn btn-sm btn-outline-warning rounded-0'
+
+:javascript
+  function togglePassword() {
+    var input = document.getElementById('inputPassword5');
+    var icon = document.getElementById('togglePasswordIcon');
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    } else {
+      input.type = "password";
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  }
