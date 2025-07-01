@@ -244,7 +244,8 @@ class Section < ApplicationRecord
 
   def set_default_values_by_import
     self.capacity = 50 
-    self.modality =  (self.code.eql? 'U') ? :equivalencia_externa : :nota_final
+    # self.modality =  (self.code.eql? 'U') ? :equivalencia_externa : :nota_final
+    self.modality = :nota_final
   end
 
   def totaly_qualified?

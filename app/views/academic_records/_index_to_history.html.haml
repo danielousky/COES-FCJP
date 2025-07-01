@@ -39,7 +39,16 @@
           %td.text-center= academic_record.section.label_modality true
           - if study_plan&.school&.have_partial_qualification?
             %th.text-center= academic_record.label_partial_qualifications  
-          %td.text-center= academic_record.q_value_to_02i
+          %td.text-center
+            = academic_record.q_value_to_02i
+            - if true
+              - qas = academic_record.qualifications
+              - if qas.any? and qas.last.versions.count > 1
+                - qa = qas.last
+                %span.fa.fa-info-circle{'data-bs-toggle': :tooltip, title: "#{qa.versions.last.event}"}
+                = link_to "/admin/qualification/#{qa.id}/history", class: 'btn btn-sm ms-1', 'data-bs-toggle': :tooltip, title: 'Ver historial de cambios de la calificación' do
+                  %span.fa.fa-history 
+
           %td.text-center.align-middle= academic_record.badge_status.html_safe
           - if (logged_as_admin and admin.authorized_manage? 'AcademicRecord' and ( enabled_delete or enabled_change or enabled_retire))
             %td.align-middle
