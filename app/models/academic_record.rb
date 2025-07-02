@@ -189,7 +189,7 @@ class AcademicRecord < ApplicationRecord
     partial_qualifications.map(&:label_qualification).join(' ').html_safe
   end
 
-  def header_for_report
+  def self.header_for_report
     # ['#', 'CI', 'NOMBRES', 'APELLIDOS','ESCUELA','CATEDRA','CÓDIGO ASIG', 'NOMBRE ASIG','PERIODO','SECCIÓN','ESTADO']
     ['#', 'CÉDULA', 'NOMBRES', 'APELLIDOS','ESCUELA','CATEDRA','CÓDIGO ASIG', 'NOMBRE ASIG', 'CRÉDITOS', 'NOTA_FINAL', 'NOTA_DEF', 'TIPO_EXAM', 'PER_LECTI', 'ANO_LECT','SECCIÓN', 'PLAN']
   end
@@ -866,181 +866,149 @@ class AcademicRecord < ApplicationRecord
       end
       fields :status, :qualifications, :period_type, :student, :user, :address, :subject
     end
-  end  
-
-  private
-
-  def self.import row, fields
-
+  end
+  def self.import(row, fields)
     total_newed = total_updated = 0
     no_registred = nil
 
-    # BUSCAR PERIODO
-    if row[3]
-      row[3] = row[3].to_s
-      row[3].strip!
-      row[3].upcase!
-    end
-
-    row[3] = fields[:nombre_periodo] if row[3].blank?
-
-    # ENCONTRAR O CREAR PERIODO
-    if row[3]
-      year, type = row[3].split('-')
-      period_type = PeriodType.find_by_code(type[0..1])
-      modality = type[2]
-      period = Period.find_or_create_by(year: year, period_type_id: period_type.id)
-    end
-
-    if period
-      # LIMPIAR CI
-      if row[0]
-        row[0] = row[0].to_s
-        row[0].strip!
-        row[0].delete! '^0-9'
-      else
-        return [0,0,0]
+    begin
+      # BUSCAR PERIODO
+      if row[3]
+        row[3] = row[3].to_s
+        row[3].strip!
+        row[3].upcase!
       end
 
-      # LIMPIAR CODIGO ASIGNATURA
-      if row[1]
-        row[1] = row[1].to_s
-        row[1].strip!
-      else
-        return [0,0,'1b']
+      row[3] = fields[:nombre_periodo] if row[3].blank?
+
+      # ENCONTRAR O CREAR PERIODO
+      if row[3]
+        year, type = row[3].split('-')
+        period_type = PeriodType.find_by_code(type[0..1])
+        modality = type[2]
+        period = Period.find_or_create_by(year: year, period_type_id: period_type.id)
       end
 
-      subject = Subject.find_by(code: row[1])
-      subject ||= Subject.find_by(code: "0#{row[1]}")
+      if period
+        # LIMPIAR CI
+        if row[0]
+          row[0] = row[0].to_s
+          row[0].strip!
+          row[0].delete! '^0-9'
+        else
+          raise "CI vacío"
+        end
 
-      if !subject.nil?
-        # p "     SUBJECT: #{subject.name}    ".center(300, "U")
-        study_plan = StudyPlan.find fields[:study_plan_id]
-        if !study_plan.nil?
-          # p "     STUDY PLAN: #{study_plan.name}    ".center(300, "P")
+        # LIMPIAR CODIGO ASIGNATURA
+        if row[1]
+          row[1] = row[1].to_s
+          row[1].strip!
+        else
+          raise "Código asignatura vacío"
+        end
 
-          escuela = study_plan.school
-          
-          # BUSCAR O CREAR PROCESO ACADEMICO:
-          # Buscar modalidad:
-          modality = AcademicProcess.letter_to_modality modality
-          
-          academic_process = AcademicProcess.where(period_id: period.id, modality: modality, school_id: escuela.id).first
+        subject = Subject.find_by(code: row[1])
+        subject ||= Subject.find_by(code: "0#{row[1]}")
 
-          if academic_process.nil?
-            academic_process = AcademicProcess.create(period_id: period.id, modality: modality, school_id: escuela.id, max_credits: 24, max_subjects: 5)
-          end
+        if !subject.nil?
+          study_plan = StudyPlan.find fields[:study_plan_id]
+          if !study_plan.nil?
+            escuela = study_plan.school
 
-          # BUSCAR O CREAR EL CURSOS (PROGRAMACIÓN):
-          # p "     ACADEMIC PROCESS: #{academic_process.name}    ".center(300, "P")
+            # Buscar modalidad:
+            modality = AcademicProcess.letter_to_modality modality
 
-          if curso = Course.find_or_create_by(subject_id: subject.id, academic_process_id: academic_process.id)
+            academic_process = AcademicProcess.where(period_id: period.id, modality: modality, school_id: escuela.id).first
 
-            # BUSCAR O CREAR SECCIÓN
-            if row[2]
-              row[2] = row[2].to_s
-              row[2].strip!
-              row[2].upcase!
-            else
-              return [0,0,2]
+            if academic_process.nil?
+              academic_process = AcademicProcess.create(period_id: period.id, modality: modality, school_id: escuela.id, max_credits: 24, max_subjects: 5)
             end
 
-            s = Section.where(code: row[2], course_id: curso.id).first
-            s ||= Section.where(code: "0#{row[2]}", course_id: curso.id).first
-            if s.nil?
-              s = Section.new(code: row[2], course_id: curso.id)
-              s.set_default_values_by_import
-            end
-
-            if s.save
-              # p "          SECTION: id:<#{s.id}> #{s.name}         ".center(1000, "S")
-
-              # BUSCAR USUARIO
-              user = User.find_by(ci: row[0])
-            
-              if user and user.student?
-                if stu = user.student
-                  # p "     STUDENT: #{stu.user_ci}    ".center(300, "E")
-
-                  # BUSCAR O CREAR GRADO
-                  grade = Grade.find_by(study_plan_id: study_plan.id, student_id: stu.id)
-                  if !grade.nil?
-                    # p "     GRADE: #{grade.name}    ".center(300, "G")
-
-                    # BUSCAR O CREAR INSCRIPCIÓN PROCESO ACADEMICO:
-                    enroll_academic_process = EnrollAcademicProcess.find_or_initialize_by(academic_process_id: academic_process.id, grade_id: grade.id)
-
-                    enroll_academic_process.set_default_values_by_import if enroll_academic_process.new_record?
-
-                    if enroll_academic_process.save
-                      # p "     ENROLL ACADEMIC PROCESS: #{enroll_academic_process.id} #{enroll_academic_process.name} section_id: #{s.id}   ".center(500, "E")
-                      # BUSCAR O CREAR REGISTRO ACADEMICO
-                      # academic_record = AcademicRecord.find_or_create_by(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id)
-                      
-                      academic_record = AcademicRecord.where(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id).first
-                      if academic_record.nil?
-                        academic_record = AcademicRecord.new(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id)
-                        if academic_record.save
-                          total_newed = 1
-                          # p "     NUEVO REGISTRO ACADEMICO: #{academic_record.id}    ROW: #{row[0]} : #{row[1]} : #{row[2]}   ".center(1000, "N")
-                        else
-                          no_registred = "#{academic_record.errors.full_messages.to_sentence.truncate(15)}"
-                        end
-                      else
-                        total_updated = 1
-                        # p "     SIN CAMBIO REGISTRO ACADEMICO: #{academic_record.name}    ".center(1000, "A")
-                        
-                      end
-
-                      if row[4] and (total_newed.eql? 1 or total_updated.eql? 1)
-                        row[4] = row[4].to_s
-                        row[4].strip! 
-                        calificacion_correcta = academic_record.set_status row[4]
-                        unless (calificacion_correcta.eql? true and academic_record.save)
-                          no_registred = 'valor nota'
-                        end
-                      end
-
-                      # if academic_record.save
-                      #   p "     EXITO. GUARDADO EL REGISTRO ACADEMICO: #{academic_record.name}    ".center(500, "#")
-                      # else
-                      #   no_registred = "#{academic_record.errors.full_messages.to_sentence.truncate(15)}"
-                      # end
-                    else
-                      no_registred = 'proceso academico'
-                    end
-                  else
-                    no_registred = 'grado'
-                  end
-                else
-                  no_registred = 'estudiante'
-                end
-
+            if curso = Course.find_or_create_by(subject_id: subject.id, academic_process_id: academic_process.id)
+              # BUSCAR O CREAR SECCIÓN
+              if row[2]
+                row[2] = row[2].to_s
+                row[2].strip!
+                row[2].upcase!
               else
-                no_registred = 'error'
+                raise "Código sección vacío"
               end
 
+              s = Section.where(code: row[2], course_id: curso.id).first
+              s ||= Section.where(code: "0#{row[2]}", course_id: curso.id).first
+              if s.nil?
+                s = Section.new(code: row[2], course_id: curso.id)
+                s.set_default_values_by_import
+              end
+
+              if s.save
+                user = User.find_by(ci: row[0])
+
+                if user && user.student?
+                  if stu = user.student
+                    grade = Grade.find_by(study_plan_id: study_plan.id, student_id: stu.id)
+                    if !grade.nil?
+                      enroll_academic_process = EnrollAcademicProcess.find_or_initialize_by(academic_process_id: academic_process.id, grade_id: grade.id)
+                      enroll_academic_process.set_default_values_by_import if enroll_academic_process.new_record?
+
+                      if enroll_academic_process.save
+                        academic_record = AcademicRecord.where(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id).first
+                        if academic_record.nil?
+                          academic_record = AcademicRecord.new(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id)
+                          if academic_record.save
+                            total_newed = 1
+                          else
+                            raise academic_record.errors.full_messages.to_sentence.truncate(15)
+                          end
+                        else
+                          total_updated = 1
+                        end
+
+                        if row[4] && (total_newed.eql?(1) || total_updated.eql?(1))
+                          row[4] = row[4].to_s
+                          row[4].strip!
+                          calificacion_correcta = academic_record.set_status row[4]
+                          unless (calificacion_correcta.eql?(true) && academic_record.save)
+                            raise "Calificación: (academic_record status: #{academic_record.status}) (calificacion_correcta: #{calificacion_correcta}). #{academic_record.errors.full_messages.to_sentence}"
+                          end
+                        end
+                      else
+                        raise "EnrollAcademicProcess: #{enroll_academic_process.errors.full_messages.to_sentence}"
+                      end
+                    else
+                      raise "Grado no encontrado para el estudiante: #{stu.name} (#{user.ci})"
+                    end
+                  else
+                    raise "Estudiante no encontrado: #{user.ci} - #{user.first_name} #{user.last_name}"
+                  end
+                else
+                  raise "Usuario no encontrado: #{row[0]}"
+                end
+              else
+                raise "Sección: #{s.errors.full_messages.to_sentence}"
+              end
             else
-              no_registred = 2
+              raise "Curso: #{curso.errors.full_messages.to_sentence}"
             end
           else
-            no_registred = 1 
+            raise "Plan de estudio no encontrado: #{fields[:study_plan_id]}"
           end
-
         else
-          no_registred = 1 # Study Plan
+          raise "Asignatura no encontrada: #{row[1]}"
         end
       else
-        no_registred = row[1]
+        raise "Periodo no encontrado: #{row[3]}"
       end
-    else
-      no_registred = 3
+
+    rescue => e
+      no_registred = e.message.truncate(250)
+      # Rails.logger.error "Error al importar AcademicRecord: #{no_registred}"
     end
-    
+
     [total_newed, total_updated, no_registred]
   end
 
-  private
+    private
 
   # TRIGGER FUNCTIONS:
   def validate_state_vs_qualification

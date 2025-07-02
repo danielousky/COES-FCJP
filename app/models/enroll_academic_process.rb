@@ -125,7 +125,7 @@ class EnrollAcademicProcess < ApplicationRecord
   def resume_payment_reports
     payment_reports.map(&:name)
   end
-  def header_for_report
+  def self.header_for_report
     ['#', 'CI', 'NOMBRES', 'APELLIDOS','ESCUELA', 'NIVEL', 'PERIODO','ESTADO INSCRIP','ESTADO PERMANENCIA','REPORTE PAGO']
   end
 
