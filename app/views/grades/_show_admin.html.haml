@@ -1,6 +1,6 @@
 .p-0
   - if session[:rol].eql? 'admin' and (current_user&.admin&.authorized_delete? 'Grade' or current_user&.admin&.authorized_manage? 'Grade')
-    = link_to '/admin/grade/8537/delete', class: 'btn btn-danger float-end' do
+    = link_to "/admin/grade/#{@grade.id}/delete", class: 'btn btn-danger float-end' do
       %span.fa.fa-trash
   .m-0.bg-primary.text-white.text-center
     = "Plan: #{@grade.study_plan&.desc}"
