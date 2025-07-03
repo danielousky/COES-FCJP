@@ -33,9 +33,9 @@ class Student < ApplicationRecord
   NACIONALIDAD = {"Venezolano/a": 0, "Extranjero/a": 1, "Venezolano/a. Nacionalizado/a": 2}
   
 
-  DISCAPACIDADES = {'SENSORIAL VISUAL': 0, 'SENSORIAL AUDITIVA': 1, 'MOTORA MIEMBROS INFERIORES': 2, 'MOTORA MIEMBROS SUPERIORES': 3, 'MOTORA AMBOS MIEMBROS': 4, 'OTRO': 5}
+  DISCAPACIDADES = {'NUNGUNA': 0, 'SENSORIAL VISUAL': 1, 'SENSORIAL AUDITIVA': 2, 'MOTORA MIEMBROS INFERIORES': 3, 'MOTORA MIEMBROS SUPERIORES': 4, 'MOTORA AMBOS MIEMBROS': 5, 'OTRO': 6}
 
-  SEDES = ['Caracas', 'Barquisimeto']
+  SEDES = ['Caracas']
 
   enum nacionality: NACIONALIDAD
   enum disability: DISCAPACIDADES
@@ -58,7 +58,8 @@ class Student < ApplicationRecord
   accepts_nested_attributes_for :address
   # has_many
   has_many :grades, dependent: :destroy
-  accepts_nested_attributes_for :grades, reject_if: proc { |attributes| attributes['id'].blank? && attributes['study_plan_id'].blank? }, allow_destroy: true
+  # accepts_nested_attributes_for :grades, reject_if: proc { |attributes| attributes['id'].blank? && attributes['study_plan_id'].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :grades, allow_destroy: true
 # creates avatar_attributes=
 
   has_many :study_plans, through: :grades
@@ -209,6 +210,7 @@ class Student < ApplicationRecord
       #   end
       # end
 
+      field :grades
       fields :nacionality, :origin_country, :origin_city, :birth_date, :marital_status, :disability, :grade_title, :grade_university, :graduate_year
 
     end
