@@ -854,8 +854,6 @@ class Grade < ApplicationRecord
       fields :student, :enroll_academic_processes, :enabled_enroll_process
       field :numbers
       field :description
-      field :language1
-      field :language2
     end
 
     # Update is edit's form
@@ -904,18 +902,45 @@ class Grade < ApplicationRecord
       field :duration_slot_time do 
         label 'Duración Cita Horaria (minutos)'
       end
-      field :language1 do
-        inline_edit false
-        inline_add false        
-      end
-      field :language2 do
-        inline_edit false
-        inline_add false        
-      end
+
     end
 
     # Edit is new's form
     edit do
+
+      field :student do
+        render do
+          student = Student.where(user_id: bindings[:view].params[:student_id]).first 
+          bindings[:view].render(partial: '/grades/custom_student_id', locals: {student: student})
+        end
+      end
+
+      field :study_plan do
+        inline_add false
+        inline_edit false
+        # render do
+        #   bindings[:view].render(partial: '/grades/custom_study_plan_id', locals: {grade: bindings[:object], study_plan: bindings[:object].study_plan, study_plans: bindings[:object].school&.study_plans})
+        # end
+      end
+      field :admission_type do
+        inline_add false        
+        inline_edit false        
+      end
+      fields :registration_status, :enrollment_status
+
+      field :start_process do
+        inline_edit false
+        inline_add false
+
+        render do
+          bindings[:view].render(partial: 'rails_admin/main/grade/custom_academic_process_id_field', locals: {schools_auh: bindings[:view]._current_user&.admin&.schools_auh, value: bindings[:object].start_process_id})
+        end
+        
+      end   
+    end
+
+    # Update is edit's form
+    update do
 
       field :student do
         render do
@@ -952,7 +977,7 @@ class Grade < ApplicationRecord
       field :duration_slot_time do 
         label 'Duración Cita Horaria (minutos)'
       end      
-    end
+    end    
 
     export do
       fields :student, :study_plan, :admission_type, :registration_status, :efficiency, :weighted_average, :simple_average, :region

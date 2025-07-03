@@ -119,12 +119,6 @@ RailsAdmin.config do |config|
       end
     end
 
-    member :old_inscripcion_coes do 
-      only [Grade]
-      link_icon do
-          'fa-solid fa-id-download'
-      end
-    end    
 
     new do
       except [EnrollAcademicProcess]
