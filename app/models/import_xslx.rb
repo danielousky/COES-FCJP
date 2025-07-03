@@ -39,12 +39,12 @@ class ImportXslx
 					sum_newed, sum_updated, sum_errors = fields[:entity].singularize.camelize.constantize.import row, fields
 					unless sum_errors.blank?
 						sum_errors = "#{(65+sum_errors).chr}" if sum_errors.is_a? Integer and sum_errors >= 0 and sum_errors < 6
-						errors << "#{i+1}:#{sum_errors}"
+						errors << "#{i+2}:#{sum_errors}"
 					end
 					total_newed += sum_newed
 					total_updated += sum_updated
 					
-					break if errors.count > 50
+					break if errors.count > 20
 					if i > 499
 						errors << 'limit_records'
 						break

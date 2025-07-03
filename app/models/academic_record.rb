@@ -1001,7 +1001,7 @@ class AcademicRecord < ApplicationRecord
       end
 
     rescue => e
-      no_registred = e.message.truncate(250)
+      no_registred = e.message.truncate(50)
       # Rails.logger.error "Error al importar AcademicRecord: #{no_registred}"
     end
 
