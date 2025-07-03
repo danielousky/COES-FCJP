@@ -14,7 +14,8 @@ class StudentSessionController < ApplicationController
 		elsif current_student.address.nil?
 			redirect_to new_student_address_path(current_student.id)
 		elsif current_student.address.empty_info?
-			redirect_to edit_address_path(current_student)
+			redirect_to new_student_address_path(current_student.id)
+			# redirect_to edit_address_path(current_student)
 		end
 
 		@student = current_student

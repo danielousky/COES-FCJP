@@ -66,10 +66,10 @@ class Address < ApplicationRecord
   validates :sector, presence: true
   validates :street, presence: true
   validates :house_type, presence: true
-  validates :house_name, presence: true
+  # validates :house_name, presence: true
 
   def empty_info?
-    (state.blank? or municipality.blank? or city.blank? or sector.blank? or street.blank? or house_type.blank? or house_name.blank?)
+    (state.blank? or municipality.blank? or city.blank? or sector.blank? or street.blank? or house_type.blank?)
   end
 
 
