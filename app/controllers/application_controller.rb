@@ -109,7 +109,7 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     # session[:academic_process_id] = AcademicProcess.first.id
 
-    if (current_user and !current_user.updated_password?)
+    if (current_user and (!current_user.updated_password? or current_user.sign_in_count.eql? 0))
       edit_password_user_path(current_user)
     else
       rols = []

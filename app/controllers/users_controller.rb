@@ -12,7 +12,7 @@ class UsersController < ApplicationController
     @user.password = @user.ci
     @user.password_confirmation = @user.ci
 
-    if @user.update(password: @user.ci, password_confirmation: @user.ci)
+    if @user.update(password: @user.ci, password_confirmation: @user.ci) and @user.update_column(:updated_password, false)
       flash[:success] = "Contraseña reseteada correctamente del usuario."
     else
       flash[:error] = "No se pudo resetear la contraseña del usuario."
