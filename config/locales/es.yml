@@ -370,6 +370,8 @@ es:
               required: requerido
         grade:
           attributes:
+            study_plan:
+              required: requerido
             admission_type:
               required: requerido
         payment_report:
