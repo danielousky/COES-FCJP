@@ -10,6 +10,16 @@
         = file_field_tag :datafile, required: true, class: 'form-control', accept: ".xls, .xlsx"
         .form-text
           %span.label.label-danger Requerido
+    .control-group.row.mb-3.custom-control.custom-checkbox
+      .col-sm-2.col-form-label.text-md-end ¿Sobreescribir registros?
+      .controls.col-sm-10
+        = check_box_tag :overwrite, nil, false, {class: 'custom-control-input'}
+    .control-group.row.mb-3
+      %label.col-sm-2.col-form-label.text-md-end Límite
+      .col-sm-10.controls
+        = number_field_tag :limit, 1000, {required: true, class: 'form-control'}
+        .form-text
+          %span.label.label-danger Requerido
 
     .control-group.row.mb-3
       %label.col-sm-2.col-form-label.text-md-end 

@@ -1,11 +1,14 @@
+#school_field.control-group.row.mb-3.enum_type
+  %label.col-sm-2.col-form-label.text-md-end{for: "study_plan_field"} Escuela
+  .col-sm-10.controls
+    - schools = current_user&.admin&.schools_auh
+    = collection_select nil, :school_id, current_user&.admin&.schools_auh, :id, :name, {:prompt => "Seleccione la escuela..."}, { class: 'form-control', required: true}
+    .form-text
+      %span.label.label-danger Requerido
+
 #study_plan_field.control-group.row.mb-3.enum_type
   %label.col-sm-2.col-form-label.text-md-end{for: "study_plan_field"} Plan de Estudio
   .col-sm-10.controls
-    - if StudyPlan.count.eql? 1 and School.count.eql? 1
-      - study_plan = StudyPlan.first
-      - @study_plan_id = study_plan.id
-      - academic_process = study_plan.school.academic_process.first
-      - @academic_process_name = academic_process&.name 
 
     = grouped_collection_select nil, :study_plan_id, School.all, :study_plans, :description, :id, :desc, {:prompt => "Seleccione plan de estudio por defecto...", selected: @study_plan_id}, { class: 'form-control', required: true}
     .form-text

@@ -397,96 +397,101 @@ class Student < ApplicationRecord
       return [0,0,0]
     end
     
-    usuario = User.find_or_initialize_by(ci: row[0])
+    usuario = User.find_by(ci: row[0])
     
-    # Email
-    row[1] = nil if fields[:console]&.eql? true
-    if row[1]
-      row[1].strip!
-      usuario.email = row[1].remove("mailto:")
-    elsif usuario.email.blank?
-      usuario.email = "#{usuario.ci}@mailinator.com"
-    # else
-    #   return [0,0,1]
-    end
+    if fields[:overwrite] or (fields[:overwrite].nil? and usuario.nil?)
+      # Email
+      usuario ||= User.new(ci: row[0])
+      row[1] = nil if fields[:console]&.eql? true
+      if row[1]
+        row[1].strip!
+        usuario.email = row[1].remove("mailto:")
+      elsif usuario.email.blank?
+        usuario.email = "#{usuario.ci}@mailinator.com"
+      # else
+      #   return [0,0,1]
+      end
 
-    # Nombres
-    if row[2]
-      row[2].strip!
-      usuario.first_name = row[2]
-    else
-      return [0,0,2]
-    end
+      # Nombres
+      if row[2]
+        row[2].strip!
+        usuario.first_name = row[2]
+      else
+        return [0,0,2]
+      end
 
-    # Apellidos
-    if row[3]
-      row[3].strip!
-      usuario.last_name = row[3] if row[3]
-    else
-      return [0,0,3]
-    end
+      # Apellidos
+      if row[3]
+        row[3].strip!
+        usuario.last_name = row[3] if row[3]
+      else
+        return [0,0,3]
+      end
 
-    # Sexo
-    if row[4]
-      row[4].strip!
-      row[4].delete! '^A-Za-z'
-      row[4] = :Masculino if row[4][0].upcase.eql? 'M'
-      row[4] = :Femenino if row[4][0].upcase.eql? 'F'
-      usuario.sex = row[4] 
-    end
+      # Sexo
+      if row[4]
+        row[4].strip!
+        row[4].delete! '^A-Za-z'
+        row[4] = :Masculino if row[4][0].upcase.eql? 'M'
+        row[4] = :Femenino if row[4][0].upcase.eql? 'F'
+        usuario.sex = row[4] 
+      end
 
-    # Numero Telefónico
-    usuario.number_phone = row[5] if row[5]
+      # Numero Telefónico
+      usuario.number_phone = row[5] if row[5]
 
-    if usuario.save!(validate: false)
-      estudiante = Student.find_or_initialize_by(user_id: usuario.id)
+      if usuario.save!(validate: false)
+        estudiante = Student.find_or_initialize_by(user_id: usuario.id)
 
-      estudiante.birth_date = row[8] if row[8]
-      # p "    Estudiante: #{estudiante.attributes.to_a.to_sentence}    ".center(600, "E")
+        estudiante.birth_date = row[8] if row[8]
+        # p "    Estudiante: #{estudiante.attributes.to_a.to_sentence}    ".center(600, "E")
 
-      new_grade = !estudiante.grades.where(study_plan_id: fields[:study_plan_id]).any?
-      grado = estudiante.grades.find_or_initialize_by(study_plan_id: fields[:study_plan_id])
-      grado.admission_type_id = fields[:admission_type_id]
+        new_grade = !estudiante.grades.where(study_plan_id: fields[:study_plan_id]).any?
+        grado = estudiante.grades.find_or_initialize_by(study_plan_id: fields[:study_plan_id])
+        grado.admission_type_id = fields[:admission_type_id]
 
-      if estudiante.save!
-        # grado = Grade.find_or_initialize_by(student_id: estudiante.id, study_plan_id: fields[:study_plan_id])
+        if estudiante.save!
+          # grado = Grade.find_or_initialize_by(student_id: estudiante.id, study_plan_id: fields[:study_plan_id])
 
-        if row[6]
-          year, type = row[6].split('-')
-          period_type = PeriodType.find_by_code(type)
-          modality = type[2]
-          period = Period.find_or_create_by(year: year, period_type_id: period_type.id)
+          if row[6]
+            year, type = row[6].split('-')
+            period_type = PeriodType.find_by_code(type)
+            modality = type[2]
+            period = Period.find_or_create_by(year: year, period_type_id: period_type.id)
 
-          modality = AcademicProcess.letter_to_modality modality
-          academic_process = AcademicProcess.where(period_id: period.id, modality: modality, school_id: grado.school.id).first
+            modality = AcademicProcess.letter_to_modality modality
+            academic_process = AcademicProcess.where(period_id: period.id, modality: modality, school_id: grado.school.id).first
 
-          if academic_process.nil?
-            academic_process = AcademicProcess.create(period_id: period.id, modality: modality, school_id: grado.school.id, max_credits: 24, max_subjects: 5)
+            if academic_process.nil?
+              academic_process = AcademicProcess.create(period_id: period.id, modality: modality, school_id: grado.school.id, max_credits: 24, max_subjects: 5)
+            end
+
+            grado.start_process_id = academic_process&.id
+
+          elsif fields[:start_process_id]
+            grado.start_process_id = fields[:start_process_id]
           end
 
-          grado.start_process_id = academic_process&.id
-
-        elsif fields[:start_process_id]
-          grado.start_process_id = fields[:start_process_id]
-        end
-
-        if row[7]
-          if aux_admission = AdmissionType.find_by_code(row[7])
-            grado.admission_type_id = aux_admission&.id
-          end
-        elsif fields[:admission_type_id]
-          grado.admission_type_id = fields[:admission_type_id]
-        else
-          grado.admission_type_id = AdmissionType.first.id
-        end
-
-        # print "AT: <#{grado.admission_type_id}>"
-
-        if grado.save
-          if new_grade
-            total_newed = 1
+          if row[7]
+            if aux_admission = AdmissionType.find_by_code(row[7])
+              grado.admission_type_id = aux_admission&.id
+            end
+          elsif fields[:admission_type_id]
+            grado.admission_type_id = fields[:admission_type_id]
           else
-            total_updated = 1
+            grado.admission_type_id = AdmissionType.first.id
+          end
+
+          # print "AT: <#{grado.admission_type_id}>"
+
+          if grado.save
+            if new_grade
+              total_newed = 1
+            else
+              total_updated = 1
+            end
+          else
+            no_registred = row
           end
         else
           no_registred = row
@@ -494,10 +499,7 @@ class Student < ApplicationRecord
       else
         no_registred = row
       end
-    else
-      no_registred = row
     end
-
     [total_newed, total_updated, no_registred]
   end
 
