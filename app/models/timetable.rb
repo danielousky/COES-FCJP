@@ -32,7 +32,7 @@ class Timetable < ApplicationRecord
 
   # Atención: Incorporar luego de que se corran las igraciones respectivas
 
-  # validates :timeblocks, presence: true, length: { minimum: 1, message: 'Debe tener al menos un bloque horario.' }
+  validates :timeblocks, presence: true, length: { minimum: 1, message: 'Debe tener al menos un bloque horario.' }
 
   scope :without_timeblocks, -> {left_outer_joins(:timeblocks).where(timeblocks: { id: nil }) }
 
