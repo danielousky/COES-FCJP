@@ -1,0 +1,46 @@
+- days = %w[Lunes Martes Miércoles Jueves Viernes Sábado]
+- intervals = []
+- (7..16).each do |h|
+  - [0, 15, 30, 45].each do |m|
+    - intervals << [h, m]
+- intervals << [17, 0] # Última fila para las 17:00
+- section_colors = {}
+
+
+- @schedules.each do |schedule|
+  - h = rand(360)
+  - s = 40 + rand(20) # saturación entre 40-60%
+  - l = 80 + rand(10) # luminosidad entre 80-90%
+  - pastel = "hsl(#{h},#{s}%,#{l}%)"
+  - sec_id = schedule.section_id
+  - section_colors[sec_id] ||= pastel#.call(sec_id)
+- schedule_map = {}
+- @schedules.each do |schedule|
+  - sec_id = schedule.section_id
+  - start = schedule.starttime.hour * 60 + schedule.starttime.min
+  - ending = schedule.endtime.hour * 60 + schedule.endtime.min
+  - (start...ending).step(15) do |min|
+    - h = min / 60
+    - m = min % 60
+    - schedule_map[[schedule.day, h, m]] = sec_id
+
+%table.table.table-bordered.text-center.align-middle
+  %thead
+    %tr
+      %th Hora
+      - days.each do |day|
+        %th= day
+  %tbody
+    - intervals.each do |(hour, min)|
+      - border_class = (min == 0) ? "border-top border-dark" : ""
+      %tr{ class: border_class }
+        %td= "%02d:%02d" % [hour, min]
+        - days.each do |day|
+          - sec_id = schedule_map[[day, hour, min]]
+          - color = section_colors[sec_id] if sec_id
+          %td{ style: ("background-color:#{color}" if color) }
+            - if sec_id
+              - section = @schedules.find { |s| s.section_id == sec_id && s.day == day && (s.starttime.hour * 60 + s.starttime.min) <= (hour * 60 + min) && (s.endtime.hour * 60 + s.endtime.min) > (hour * 60 + min) }&.section
+              - if section
+                %p= section.subject&.code
+                %small.text-muted= section.schedule_teacher_desc_short

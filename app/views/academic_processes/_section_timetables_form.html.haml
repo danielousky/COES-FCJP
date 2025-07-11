@@ -1,0 +1,111 @@
+- if false 
+  = f.fields_for :timetable do |tt|
+    .fields
+      = tt.hidden_field :_destroy, value: false, autocomplete: :off
+      %a.remove_nested_fields{"data-association": "timetable", href: "javascript:void(0)"}
+        %span.btn.btn-danger
+          %i.fas.fa-trash
+      %span.object-infos{"data-model-label": "Horario", "data-object-label": "Nuevo", style: "display:none"}
+      %fieldset
+        - # COLOR FIELD
+        #section_timetable_attributes_color_field.control-group.row.mb-3.string_type.color_field
+          = tt.label :color, "Color", class: "col-sm-2 col-form-label text-md-end"
+          .col-sm-10.controls
+            = tt.color_field :color, class: "form-control", size: 50, style: "border-color: #e0e0e0;"
+            .form-text
+              %span.label.label-default Opcional
+
+            =# color_field_tag "section[timetable_attributes][color]", timetable.color, id: "section_timetable_attributes_color", class: "form-control", size: 50, style: "border-color: #e0e0e0;"#, oninput: "this.value = pastelColor(this.value)"
+
+            :javascript
+              // Permitir solo colores pasteles en el color picker
+              function pastelColor(hex) {
+                // Asegura formato #RRGGBB
+                if(!/^#[0-9A-F]{6}$/i.test(hex)) return hex;
+                var r = parseInt(hex.substr(1,2),16);
+                var g = parseInt(hex.substr(3,2),16);
+                var b = parseInt(hex.substr(5,2),16);
+                // Mezcla con blanco para obtener pastel
+                r = Math.round((r + 255) / 2);
+                g = Math.round((g + 255) / 2);
+                b = Math.round((b + 255) / 2);
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+              }
+        
+        - # TIMEBLOCKS FIELD
+        #section_timetable_attributes_timeblocks_attributes_field.control-group.row.mb-3.has_many_association_type.timeblocks_field
+          %label.col-sm-2.col-form-label.text-md-end{for: "section_timetable_attributes_timeblocks_attributes"} Bloques Horarios
+          .controls.col-sm-10{"data-nestedmany" => "true"}
+            .btn-group
+              %a.btn.btn-info.toggler.disabled{"aria-expanded" => "true", "data-bs-target" => "#section_timetable_attributes_timeblocks_attributes_field .collapse", "data-bs-toggle" => "collapse", :role => "button"}
+                %i.fas.fa-chevron-right
+              %a.btn.btn-info.add_nested_fields{"data-association" => "timeblocks", "data-blueprint-id" => "timetable_timeblocks_fields_blueprint", :href => "javascript:void(0)"}
+                %i.fas.fa-plus
+                Agregar
+            .form-text
+              %span.label.label-danger Requerido
+
+            %ul.nav.nav-tabs.collapse
+          .tab-content.collapse
+
+      
+
+
+
+
+
+- if true
+  .fields
+    %input#section_timetable_attributes__destroy{autocomplete: :off, name: "section[timetable_attributes][_destroy]", type: "hidden", value: "false"}
+    %a.remove_nested_fields{"data-associatio": "timetable", href: "javascript:void(0)"}
+      %span.btn.btn-danger
+        %i.fas.fa-trash
+    %span.object-infos{"data-model-label": "Horario", "data-object-label": "Nuevo", style: "display:none"}
+    %fieldset
+      - # COLOR FIELD
+      - if false
+        - # El color se agrega directamente con un callback desde el modelo
+        - # Posteriormente podrá implementarse el control del mismo
+        #section_timetable_attributes_color_field.control-group.row.mb-3.string_type.color_field
+          %label.col-sm-2.col-form-label.text-md-end{for: "section_timetable_attributes_color"} Color
+          .col-sm-10.controls
+            - timetable = @section.timetable || Timetable.new
+            =# "<label style='background-color: #{timetable.color}; width: 20px; height: 20px; display: inline-block;'></span>".html_safe
+
+            = color_field_tag "section[timetable_attributes][color]", '218,140,100', id: "section_timetable_attributes_color", class: "form-control", size: 50, oninput: "this.value = pastelColor(this.value)"
+            =# hidden_field_tag "section[timetable_attributes][color]", timetable.color, id: "section_timetable_attributes_color"
+            
+            :javascript
+              // Permitir solo colores pasteles en el color picker
+              function pastelColor(hex) {
+                // Asegura formato #RRGGBB
+                if(!/^#[0-9A-F]{6}$/i.test(hex)) return hex;
+                var r = parseInt(hex.substr(1,2),16);
+                var g = parseInt(hex.substr(3,2),16);
+                var b = parseInt(hex.substr(5,2),16);
+                // Mezcla con blanco para obtener pastel
+                r = Math.round((r + 255) / 2);
+                g = Math.round((g + 255) / 2);
+                b = Math.round((b + 255) / 2);
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+              }
+      
+      - # TIMEBLOCKS FIELD
+      #section_timetable_attributes_timeblocks_attributes_field.control-group.row.mb-3.has_many_association_type.timeblocks_field
+        %label.col-sm-2.col-form-label.text-md-end{for: "section_timetable_attributes_timeblocks_attributes"} Bloques Horarios
+        .controls.col-sm-10{"data-nestedmany" => "true"}
+          .alert.alert-warning.py-1.my-1 Agregue tantos bloques horarios como necesite
+          .btn-group
+            %a.btn.btn-info.toggler.disabled{"aria-expanded" => "true", "data-bs-target" => "#section_timetable_attributes_timeblocks_attributes_field .collapse", "data-bs-toggle" => "collapse", :role => "button"}
+              %i.fas.fa-chevron-right
+            %a.btn.btn-info.add_nested_fields{"data-association" => "timeblocks", "data-blueprint-id" => "timetable_timeblocks_fields_blueprint", :href => "javascript:void(0)"}
+              %i.fas.fa-plus
+              Agregar
+          .form-text
+            %span.label.label-danger Requerido
+
+          %ul.nav.nav-tabs.collapse
+        .tab-content.collapse
+
+        
+

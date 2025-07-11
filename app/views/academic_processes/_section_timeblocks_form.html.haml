@@ -1,0 +1,90 @@
+
+.fields.tab-pane
+  %input#section_timetable_attributes_timeblocks_attributes_new_timeblocks__destroy{autocomplete: :off, name: "section[timetable_attributes][timeblocks_attributes][new_timeblocks][_destroy]", type: "hidden", value: "false"}
+  %a.remove_nested_fields{"data-association" => "timeblocks", :href => "javascript:void(0)"}
+    %span.btn.btn-danger
+      %i.fas.fa-trash
+  %span.object-infos{"data-model-label" => "bloque Horario", "data-object-label" => "Nuevo", :style => "display:none"}
+  %fieldset
+    - # DAY FIELD:
+    #section_timetable_attributes_timeblocks_attributes_new_timeblocks_day_field.control-group.row.mb-3.enum_type.day_field
+      %label.col-sm-2.col-form-label.text-md-end{:for => "section_timetable_attributes_timeblocks_attributes_day"} Día
+      .col-sm-10.controls
+        .btn-group.btn-group-toggle{"data-toggle" => "buttons"}
+          - days = [['Lunes', 0], ['Martes', 1], ['Miércoles', 2], ['Jueves', 3], ['Viernes', 4], ['Sábado', 5]]
+          - days.each_with_index do |(day_name, day_value), idx|
+            %label.btn.btn-info
+              = radio_button_tag 'section[timetable_attributes][timeblocks_attributes][new_timeblocks][day]', day_name, idx == 0, id: "section_timetable_attributes_timeblocks_attributes_day_#{day_value}"
+              = day_name
+        .form-text
+          %span.label.label-danger Requerido
+    - # START TIME FIELD:          
+    .alert.alert-warning.py-1.my-1 Tenga en cuenta que los bloques serán mostradado en una tabla donde cada celda comienza en hora con multiplos de 15 minutos. Se recomienda, colocar minutos comprandidos entre 00, 15, 30. 
+    #section_timetable_attributes_timeblocks_attributes_new_timeblocks_start_time_field.control-group.row.mb-3.time_type.start_time_field
+      .col-sm-2.col-form-label.text-md-end Hora Inicio
+      .col-sm-10.controls
+        .row
+          .col-sm-4
+            .input-group 
+              = time_field_tag 'section[timetable_attributes][timeblocks_attributes][new_timeblocks][start_time]', nil, class: 'form-control', required: true, min: '06:00', max: '21:00', step: '01:15', include_seconds: false
+        .form-text
+          %span.label.label-danger> Requerido
+
+
+
+    - # END TIME FIELD:
+    #section_timetable_attributes_timeblocks_attributes_new_timeblocks_end_time_field.control-group.row.mb-3.time_type.end_time_field
+      .col-sm-2.col-form-label.text-md-end Hora Final
+      .col-sm-10.controls
+        .row
+          .col-sm-4
+            .input-group
+              = time_field_tag 'section[timetable_attributes][timeblocks_attributes][new_timeblocks][end_time]', nil, class: 'form-control', required: true
+        .form-text
+          %span.label.label-danger> Requerido
+
+    - # MODALITY FIELD:
+    #section_timetable_attributes_timeblocks_attributes_new_timeblocks_modality_field.control-group.row.mb-3.enum_type.modality_field
+      %label.col-sm-2.col-form-label.text-md-end{:for => "section_timetable_attributes_timeblocks_attributes_new_timeblocks_modality"} Modalidad
+      .col-sm-10.controls
+        .btn-group.btn-group-toggle{"data-toggle" => "buttons"}
+
+          - Timeblock.modalities.each_with_index do |(key, value), idx|
+            %label.btn.btn-info{ for: "section_timetable_attributes_timeblocks_attributes_new_timeblocks_modality_#{value}" }
+              = radio_button_tag 'section[timetable_attributes][timeblocks_attributes][new_timeblocks][modality]', key, idx == 0, id: "section_timetable_attributes_timeblocks_attributes_new_timeblocks_modality_#{value}"
+              = key.humanize
+
+        .form-text
+          %span.label.label-danger Requerido
+
+    - # TEACHER FIELD:
+    #section_timetable_attributes_timeblocks_attributes_new_timeblocks_teacher_id_field.control-group.row.mb-3.belongs_to_association_type.teacher_field
+      %label.col-sm-2.col-form-label.text-md-end{for: "section_timetable_attributes_timeblocks_attributes_new_timeblocks_teacher_id"} Profesor
+      .col-sm-10.controls
+        .row
+          .col-sm-4
+            %select#section_timetable_attributes_timeblocks_attributes_new_timeblocks_teacher_id{"data-filteringselect" => "true", "data-options" => "{\"xhr\":true,\"remote_source\":\"/admin/teacher?associated_collection=teacher\\u0026compact=true\\u0026current_action=create\\u0026source_abstract_model=section\"}", :name => "section[teacher_id]", :placeholder => "Buscar", :style => "display: none;"}
+              %option{:label => " ", :value => ""}
+              %option{:value => ""}
+            .input-group.filtering-select{"data-input-for" => "section_timetable_attributes_timeblocks_attributes_new_timeblocks_teacher_id"}
+              = text_field_tag nil, nil, id: 'section_timetable_attributes_timeblocks_attributes_new_timeblocks_teacher_id_filter', class: 'form-control ra-filtering-select-input ui-autocomplete-input', autocomplete: 'off', placeholder: 'Buscar', style: '', type: 'text'
+              %span.input-group-btn
+                %label.btn.btn-info.dropdown-toggle{:role => "button", for: 'section_timetable_attributes_timeblocks_attributes_new_timeblocks_teacher_id_filter'}
+        .form-text
+          %span.label.label-default> Opcional
+
+
+
+
+    - # CLASSROOM FIELD:
+    #section_timetable_attributes_timeblocks_attributes_new_timeblocks_classroom_field.control-group.row.mb-3.string_type.classroom_field
+      %label.col-sm-2.col-form-label.text-md-end{:for => "section_timetable_attributes_timeblocks_attributes_new_timeblocks_classroom"} Aula
+      .col-sm-10.controls
+        = text_field_tag 'section[timetable_attributes][timeblocks_attributes][new_timeblocks][classroom]', nil, id: 'section_timetable_attributes_timeblocks_attributes_new_timeblocks_classroom', class: 'form-control', size: 50
+        .form-text
+          %span.label.label-default> Opcional
+
+
+
+
+

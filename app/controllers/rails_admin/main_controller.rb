@@ -172,6 +172,19 @@ module RailsAdmin
       target_params.slice!(*allowed_methods)
       target_params.permit! if target_params.respond_to?(:permit!)
       fields.select(&:nested_form).each do |association|
+        children = target_params[association.method_name]
+        # children_params =
+        #   if association.multiple?
+        #     if children.is_a?(Hash)
+        #       children.values
+        #     elsif children.is_a?(Array)
+        #       children
+        #     else
+        #       []
+        #     end
+        #   else
+        #     [children].compact
+        #   end        
         children_params = association.multiple? ? target_params[association.method_name].try(:values) : [target_params[association.method_name]].compact
         (children_params || []).each do |children_param|
           sanitize_params_for!(:nested, association.associated_model_config, children_param)

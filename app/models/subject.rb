@@ -5,6 +5,7 @@
 #  id                 :bigint           not null, primary key
 #  active             :boolean          default(TRUE)
 #  code               :string           not null
+#  color              :string
 #  force_absolute     :boolean          default(FALSE)
 #  name               :string           not null
 #  ordinal            :integer          default(0), not null
@@ -587,6 +588,9 @@ class Subject < ApplicationRecord
   end
 
   private
+  def self.generate_color
+    "#{rand(150..230)},#{rand(150..230)},#{rand(150..230)}"
+  end  
   
   def self.import row, fields
     total_newed = total_updated = 0

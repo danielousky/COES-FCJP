@@ -97,7 +97,7 @@ class SectionsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def section_params
-      params.require(:section).permit(:id, :code, :capacity, :course_id, :teacher_id, :qualified, :modality, :classroom, :enabled, :secondary_teachers)
+      params.require(:section).permit(:id, :code, :capacity, :course_id, :teacher_id, :qualified, :modality, :enabled, :secondary_teachers, timetables_attributes: [:id, :color, :section, :_destroy, timeblocks_attributes: [:id, :day, :start_time, :end_time, :modality, :teacher_id, :classroom, :_destroy]])
     end
 
   # def schedules_params

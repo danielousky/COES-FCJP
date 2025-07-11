@@ -328,6 +328,9 @@ es:
   # remove these aliases after 'activemodel' and 'activerecord' namespaces are removed from Rails repository
   activemodel:
     errors:
+      messages:
+        required: Requerido
+
       <<: *errors
   activerecord:
     errors:
@@ -418,6 +421,24 @@ es:
               required: Requerido
             school:
               required: Requerido
+        timeblock:
+          attributes:
+            start_time:
+              required: requerido
+              too_close_to_end: "debe ser al menos 30 minutos antes que la hora de fin"
+            end_time:
+              required: requerido
+            day_of_week:
+              required: requerido
+        timetable:
+          attributes:
+            timeblocks:
+              required: requerido
+            course:
+              required: requerido
+            section:
+              required: requerido
+
             subject_type:
               required: Requerido
         subject_link:

@@ -6,7 +6,7 @@
 
 
 - if (current_user&.admin&.authorized_manage? 'Course')
-
+  - @section = Section.new
   - content = render("/academic_processes/form_section", return_id: @object.id)
 
   = render partial: 'layouts/scaffold-modal', locals: {id: "NewSectionModal", title: "Nueva Sección", content: content}

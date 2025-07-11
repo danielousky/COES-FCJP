@@ -1,76 +1,73 @@
-%form#new_section.main{"accept-charset": "UTF-8", action: "/admin/section/new", enctype: "multipart/form-data", method: "post"}
-  %input{autocomplete: "off", name: "authenticity_token", type: "hidden", value: session[:_csrf_token]}
-  = hidden_field_tag '[section]course_id', nil
+= form_for @section, url: "/admin/section/new", html: { id: "new_section", class: "main", enctype: "multipart/form-data", autocomplete: "off" } do |f|
+  - @f = f
+  = hidden_field_tag :authenticity_token, session[:_csrf_token]
+  = f.hidden_field :course_id
+  =# hidden_field_tag '[section]course_id', nil
+
   %fieldset
     #section_code_field.control-group.row.mb-3.string_type.code_field
       %label.col-sm-2.col-form-label.text-md-end{for: "section_code"} Sección
       .col-sm-2.controls
-        %input#section_code.form-control{:length => "8", :name => "section[code]", :oninput => "$(this).val($(this).val().toUpperCase().replace(/[^A-Za-z0-9]/g,''))", :required => "required", :size => "8", :type => "text"}/
+        = f.text_field :code, id: "section_code", class: "form-control", length: 8, size: 8, required: true, oninput: "$(this).val($(this).val().toUpperCase().replace(/[^A-Za-z0-9]/g,''))"
         .form-text
           %span.label.label-danger Requerido
           Caracteres entre 1-7.
+
     #section_modality_field.control-group.row.mb-3.enum_type.modality_field
       %label.col-sm-2.col-form-label.text-md-end{for: "section_modality"} Tipo
       .col-sm-10.controls
         .row
           .col-sm-4
-            %select#section_modality{"data-enumeration" => "true", :name => "section[modality]", :placeholder => "Buscar", :style => "display: none;"}
-              %option{:label => " ", :value => ""}
-              %option{:value => "0"} nota_final
-              %option{:value => "1"} equivalencia
+            = f.select :modality, [["nota_final", 0], ["equivalencia", 1]], { include_blank: true }, id: "section_modality", data: { enumeration: true }, placeholder: "Buscar", style: "display: none;"
             .input-group.filtering-select{"data-input-for" => "section_modality"}
               %input#section_modality_filter.form-control.ra-filtering-select-input.ui-autocomplete-input{:autocomplete => "off", :placeholder => "Buscar", :required => "required", :style => "", :type => "text"}/
               %span.input-group-btn
                 %label.btn.btn-info.dropdown-toggle{:role => "button", for: 'section_modality_filter'}
         .form-text
           %span.label.label-danger Requerido
+
     #section_capacity_field.control-group.row.mb-3.integer_type.capacity_field
       %label.col-sm-2.col-form-label.text-md-end{for: "section_capacity"} Capacidad
       .col-sm-10.controls
-        %input#section_capacity.form-control{:min => "1", :name => "section[capacity]", :required => "required", :type => "number"}/
+        = f.number_field :capacity, id: "section_capacity", class: "form-control", min: 1, required: true
         .form-text
           %span.label.label-danger Requerido
+
     #section_teacher_id_field.control-group.row.mb-3.belongs_to_association_type.teacher_field
       %label.col-sm-2.col-form-label.text-md-end{for: "section_teacher_id"} Profesor
       .col-sm-10.controls
         .row
           .col-sm-4
-            %select#section_teacher_id{"data-filteringselect" => "true", "data-options" => "{\"xhr\":true,\"remote_source\":\"/admin/teacher?associated_collection=teacher\\u0026compact=true\\u0026current_action=create\\u0026source_abstract_model=section\"}", :name => "section[teacher_id]", :placeholder => "Buscar", :style => "display: none;"}
-              %option{:label => " ", :value => ""}
-              %option{:value => ""}
+            = f.select :teacher_id, [], { include_blank: true }, id: "section_teacher_id", data: { filteringselect: true, options: "{\"xhr\":true,\"remote_source\":\"/admin/teacher?associated_collection=teacher\\u0026compact=true\\u0026current_action=create\\u0026source_abstract_model=section\"}" }, placeholder: "Buscar", style: "display: none;"
             .input-group.filtering-select{"data-input-for" => "section_teacher_id"}
               %input#section_teacher_id_filter.form-control.ra-filtering-select-input.ui-autocomplete-input{:autocomplete => "off", :placeholder => "Buscar", :style => "", :type => "text"}/
               %span.input-group-btn
                 %label.btn.btn-info.dropdown-toggle{:role => "button", for: 'section_teacher_id_filter'}
         .form-text
           %span.label.label-default Opcional
-    #section_classroom_field.control-group.row.mb-3.string_type.classroom_field
-      %label.col-sm-2.col-form-label.text-md-end{for: "section_classroom"} Aula
-      .col-sm-10.controls
-        %input#section_classroom.form-control{:name => "section[classroom]", :oninput => "$(this).val($(this).val().toUpperCase().replace(/[^A-Za-z0-9| ]/g,''))", :type => "text"}/
-        .form-text
-          %span.label.label-default Opcional
-    #section_schedules_attributes_field.control-group.row.mb-3.has_many_association_type.schedules_field
-      .col-sm-2.col-form-label.text-md-end Horarios
-      .controls.col-sm-10{"data-nestedmany" => "true"}
+
+    #section_timetable_attributes_field.control-group.row.mb-3.has_one_association_type.timetable_field
+      %label.col-sm-2.col-form-label.text-md-end{:for => "section_timetable_attributes"} Horario
+      .controls.col-sm-10{"data-nestedone" => "true"}
         .btn-group
-          %a.btn.btn-info.toggler.disabled{"data-bs-toggle" => "collapse", :role => "button"}
+          %a.btn.btn-info.toggler.disabled{"aria-expanded" => "false", "data-bs-target" => "#section_timetable_attributes_field .collapse", "data-bs-toggle" => "collapse", :role => "button"}
             %i.fas.fa-chevron-right
-          %a.btn.btn-info.add_nested_fields{"data-association" => "schedules", "data-blueprint-id" => "schedules_fields_blueprint", :href => "javascript:void(0)"}
+          %a.btn.btn-info.add_nested_fields{"data-add-label" => "<i class=\"fas fa-plus\"></i> Agregar", "data-association" => "timetable", "data-blueprint-id" => "timetable_fields_blueprint", :href => "javascript:void(0)"}
             %i.fas.fa-plus
             Agregar
         .form-text
           %span.label.label-default Opcional
-        %ul.nav.nav-tabs.collapse
+        %ul.nav.collapse
       .tab-content.collapse
+
+    - content = render partial: '/academic_processes/section_timetables_form', locals: {f: f}
+    #timetable_fields_blueprint{"data-blueprint" => content, :style => "display: none"}
   .form-actions.row.justify-content-end.my-3
     .col-sm-10
-      %input{name: :return_to, type: :hidden, value: request.original_url}
+      = hidden_field_tag :return_to, request.original_url
       %button.btn.btn-primary{"data-disable-with" => "Guardar", :name => "_save", :type => "submit"}
         %i.fas.fa-check
         Guardar
 
-- content = render partial: '/academic_processes/section_schedules_form'
-
-#schedules_fields_blueprint{"data-blueprint" => content, :style => "display: none"}
-
+- content = render partial: '/academic_processes/section_timeblocks_form'
+#timetable_timeblocks_fields_blueprint{"data-blueprint" => content, :style => "display: none"}

@@ -49,6 +49,10 @@ Rails.application.routes.draw do
     end
   end
 
+
+  resources :timetables, only: [:show]
+  get 'timetables/:type/:id', to: 'timetables#show', as: 'specific_timetable'  
+
   resources :authorizeds do
     collection do
       post :update_authorize

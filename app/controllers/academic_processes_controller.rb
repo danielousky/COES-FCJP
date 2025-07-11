@@ -142,11 +142,15 @@ class AcademicProcessesController < ApplicationController
               nueva_seccion.teacher_id = nil unless params[:teachers]
               nueva_seccion.qualified = false
               if nueva_seccion.save
-                if params[:schedules]
-                  section.schedules.each do |sh|
-                    sh_aux = sh.dup
-                    sh_aux.section_id = nueva_seccion.id
-                    sh_aux.save
+                if params[:schedules] and section.timetable
+                  tt_aux = section.timetable.dup
+                  tt_aux.section_id = nueva_seccion.id
+                  if tt_aux.save
+                    section.timetable.timeblocks.each do |tb|
+                      tb_aux = tb.dup
+                      tb_aux.timetable_id = tt_aux.id
+                      tb_aux.save
+                    end
                   end
                 end
                 completed +=1

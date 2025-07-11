@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_10_16_194706) do
+ActiveRecord::Schema[7.0].define(version: 2025_07_10_212157) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -559,6 +559,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_16_194706) do
     t.bigint "subject_type_id", null: false
     t.bigint "school_id"
     t.bigint "departament_id"
+    t.string "color"
     t.index ["area_id"], name: "index_subjects_on_area_id"
     t.index ["departament_id"], name: "index_subjects_on_departament_id"
     t.index ["school_id"], name: "index_subjects_on_school_id"
@@ -571,6 +572,31 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_16_194706) do
     t.bigint "departament_id"
     t.index ["departament_id"], name: "index_teachers_on_departament_id"
     t.index ["user_id"], name: "index_teachers_on_user_id"
+  end
+
+  create_table "timeblocks", force: :cascade do |t|
+    t.integer "day", default: 0
+    t.time "start_time", default: "2000-01-01 07:00:00"
+    t.time "end_time", default: "2000-01-01 09:00:00"
+    t.integer "modality", default: 0
+    t.string "classroom"
+    t.bigint "teacher_id"
+    t.bigint "timetable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["teacher_id"], name: "index_timeblocks_on_teacher_id"
+    t.index ["timetable_id", "day", "end_time"], name: "index_timeblocks_on_timetable_and_day_and_end_time", unique: true
+    t.index ["timetable_id", "day", "start_time"], name: "index_timeblocks_on_timetable_and_day_and_start_time", unique: true
+    t.index ["timetable_id"], name: "index_timeblocks_on_timetable_id"
+  end
+
+  create_table "timetables", force: :cascade do |t|
+    t.string "name"
+    t.string "color"
+    t.bigint "section_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["section_id"], name: "index_timetables_on_section_id"
   end
 
   create_table "tutorials", force: :cascade do |t|
@@ -675,5 +701,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_10_16_194706) do
   add_foreign_key "subjects", "subject_types"
   add_foreign_key "teachers", "departaments"
   add_foreign_key "teachers", "users"
+  add_foreign_key "timeblocks", "timetables"
+  add_foreign_key "timetables", "sections"
   add_foreign_key "tutorials", "group_tutorials"
 end

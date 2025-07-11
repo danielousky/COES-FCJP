@@ -1,6 +1,11 @@
 - school = enroll_academic_process.school
 - enabled_to_admin = (current_user&.admin? and session[:rol].eql? 'admin') ? true : false
 
+- if enroll_academic_process.timetables.any?
+  = link_to "/timetables/EnrollAcademicProcess/#{enroll_academic_process.id}", class: 'btn btn-sm btn-success float-end', 'data-bs-toggle': :tooltip,'data-bs-title': 'Ver Horarios de Clases' do
+    %i.fa.fa-clock
+    %i.fa.fa-calendar
+
 - if enabled_to_admin and current_user&.admin&.authorized_manage? 'EnrollAcademicProcess'
   - if enroll_academic_process.academic_records.not_retirado.any?
     = link_to "/enroll_academic_processes/#{enroll_academic_process.id}/total_retire", class: 'btn btn-sm float-end btn-danger align-middle mx-1', 'data-confirm': "Esta acción retirará todas los registros académicos de la inscripción ¿Está completamente suguro?", method: :put, 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: 'Retirar todas las asignaturas inscritas en éste período', rel: :tooltip do

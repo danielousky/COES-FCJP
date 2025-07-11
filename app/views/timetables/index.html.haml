@@ -1,0 +1,41 @@
+.container-fluid
+  .row
+    .col-12
+      %h1.mt-4.mb-3 Horarios Académicos
+      
+  .row
+    .col-md-6
+      .card.mb-4
+        .card-header
+          %h4 Horarios de Profesores
+        .card-body
+          .list-group
+            - @teachers.each do |teacher|
+              = link_to specific_timetable_path(type: 'Teacher', id: teacher.id), class: 'list-group-item list-group-item-action d-flex justify-content-between align-items-center' do
+                = teacher.user_description
+                %span.badge.bg-primary.rounded-pill
+                  = teacher.sections.count
+    
+    .col-md-6
+      .card.mb-4
+        .card-header
+          %h4 Horarios de Secciones
+        .card-body
+          .list-group
+            - @sections.each do |section|
+              = link_to specific_timetable_path(type: 'Section', id: section.id), class: 'list-group-item list-group-item-action d-flex justify-content-between align-items-center' do
+                = "#{section.subject.code} - #{section.code}"
+                %span.badge.bg-info.rounded-pill
+                  = section.schedules.count
+  
+  .row
+    .col-12
+      .card.mb-4
+        .card-header
+          %h4 Buscar Horario de Estudiante
+        .card-body
+          = form_tag timetables_path, method: :get, class: 'row g-3' do
+            .col-md-6
+              = text_field_tag :student_ci, nil, class: 'form-control', placeholder: 'Cédula del Estudiante'
+            .col-md-4
+              = submit_tag 'Buscar', class: 'btn btn-primary'

@@ -1,0 +1,79 @@
+.timetable-container {
+  overflow-x: auto;
+}
+
+.timetable-table {
+  min-width: 800px;
+  table-layout: fixed;
+}
+
+.time-header {
+  width: 80px;
+}
+
+.time-cell {
+  width: 80px;
+  height: 20px;
+  vertical-align: top;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.schedule-cell {
+  position: relative;
+  height: 20px;
+  padding: 0 !important;
+  vertical-align: top;
+}
+
+.schedule-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  padding: 5px;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  z-index: 1;
+  transition: all 0.2s ease;
+}
+
+.schedule-item:hover {
+  z-index: 10;
+  transform: scale(1.02);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.schedule-title {
+  font-weight: bold;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.schedule-details {
+  font-size: 0.75rem;
+  display: none;
+}
+
+.schedule-item:hover .schedule-details {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .time-cell, .schedule-cell {
+    height: 50px;
+  }
+  
+  .time-header {
+    width: 60px;
+  }
+  
+  .time-cell {
+    width: 60px;
+  }
+}

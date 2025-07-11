@@ -1,0 +1,144 @@
+.container-fluid
+  .row.mb-3
+    .col-12
+      %h4.m-4.text-center= @title
+      = link_to request.referer, class: 'btn btn-secondary' do
+        %i.fa.fa-arrow-left
+        Volver a Principal
+      
+  .row
+    .col-12
+      .card
+        .card-header.d-flex.justify-content-between.align-items-center
+          %h3 
+            Horario Semanal de 
+            = @academic_process&.short_desc
+          .btn-group
+            %button.btn.btn-sm.btn-outline-primary.active{type: 'button', data: {view: 'week'}} Vista Semanal
+            %button.btn.btn-sm.btn-outline-primary{type: 'button', data: {view: 'list'}} Vista Lista
+        
+        .card-body.p-0
+          .timetable-container
+            .timetable-week
+              %table.table.table-bordered.timetable-table.table-sm.table-striped.table-hover.table-responsive.table-sm
+                %thead
+                  %tr{style: "height: 10px;max-height: 10px;"}
+                    %th.time-header.text-center Hora
+                    - @days.each do |day|
+                      %th.text-center= day
+                %tbody
+                  - (@start_hour..@end_hour).each do |hour|
+                    - ["00", "15", "30", "45"].each do |minute|
+                      - time_str = "#{hour.to_s.rjust(2, '0')}:#{minute}"
+                      %tr
+                        %td.time-cell.text-center.align-middle{data: {time: time_str}}
+                          = time_str.to_time.strftime("%I:%M %P")
+                        - @days.each do |day|
+                          %td.schedule-cell{data: {day: day, time: time_str}}
+                            - if @time_slots[day] && @time_slots[day][time_str]
+                              - @time_slots[day][time_str].each do |slot|
+                                .schedule-item{style: "background-color: #{slot[:color]};", data: {id: slot[:id]}}
+                                  .schedule-title.bg-dark.text-light.text-center.p-1
+                                    = slot[:subject_code]
+                                    %span.badge.bg-secondary.font-weight-bold= slot[:section_code]
+                                  .schedule-details.p-2.container-fluid
+                                    
+                                    .text-center= "#{slot[:start_time].to_time.strftime("%I:%M %P")} - #{slot[:end_time].to_time.strftime("%I:%M %P")}"
+                                    %p= slot[:title]
+                                    %div= slot[:classroom]
+                                    %div= slot[:teacher]
+                                    %p.small.text-center= slot[:academic_process]
+                                    %span.badge.bg-info.float-end= slot[:modality]
+            
+            .timetable-list.d-none
+              .list-group
+                - @days.each do |day|
+                  .list-group-item.list-group-item-secondary.fw-bold= day
+                  - if @time_slots[day]
+                    - @time_slots[day].sort.each do |time, slots|
+                      - slots.each do |slot|
+                        .list-group-item
+                          .d-flex.w-100.justify-content-between
+                            %h5.mb-1= slot[:title]
+                            %small= "#{slot[:start_time].to_time.strftime("%I:%M %P")} - #{slot[:end_time].to_time.strftime("%I:%M %P")}"
+                          %p.mb-1
+                            %span.badge.bg-secondary= slot[:section_code]
+                            = slot[:classroom]
+                          %small
+                            = slot[:teacher]
+                            %span.badge.bg-info.ms-2= slot[:modality]
+                  - else
+                    .list-group-item.text-muted No hay clases programadas
+
+:javascript
+  document.addEventListener('turbo:load', function() {
+    // Switch between week and list views
+    document.querySelectorAll('[data-view]').forEach(button => {
+      button.addEventListener('click', function() {
+        const view = this.dataset.view;
+        document.querySelectorAll('[data-view]').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        
+        if (view === 'week') {
+          document.querySelector('.timetable-week').classList.remove('d-none');
+          document.querySelector('.timetable-list').classList.add('d-none');
+        } else {
+          document.querySelector('.timetable-week').classList.add('d-none');
+          document.querySelector('.timetable-list').classList.remove('d-none');
+        }
+      });
+    });
+    
+    // Position schedule items correctly in the grid
+    positionScheduleItems();
+  });
+  
+  function positionScheduleItems() {
+    const timeSlots = #{@time_slots.to_json.html_safe};
+    
+    Object.keys(timeSlots).forEach(day => {
+      Object.keys(timeSlots[day]).forEach(startTime => {
+        timeSlots[day][startTime].forEach(slot => {
+          const startCell = document.querySelector(`[data-day="${day}"][data-time="${startTime}"]`);
+          if (!startCell) return;
+          
+          const [startHour, startMinute] = slot.start_time.split(':').map(Number);
+          const [endHour, endMinute] = slot.end_time.split(':').map(Number);
+          
+          // Calculate duration in 30-minute blocks
+          const durationInMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+          const rowSpan = Math.ceil(durationInMinutes / 15); // 15 minutes per row
+          
+          // Create or find the schedule item
+          let scheduleItem = startCell.querySelector(`.schedule-item[data-id="${slot.id}"]`);
+          if (!scheduleItem) {
+            scheduleItem = document.createElement('div');
+            scheduleItem.classList.add('schedule-item');
+            scheduleItem.dataset.id = slot.id;
+            scheduleItem.style.backgroundColor = slot.color;
+            
+            const title = document.createElement('div');
+            title.classList.add('schedule-title');
+            title.textContent = slot.title;
+            
+            const details = document.createElement('div');
+            details.classList.add('schedule-details');
+            details.innerHTML = `
+              <span class="badge bg-secondary">${slot.section_code}</span>
+              <div>${slot.start_time} - ${slot.end_time}</div>
+              <div>${slot.classroom}</div>
+              <div>${slot.teacher}</div>
+              <span class="badge bg-info">${slot.modality === 'Presencial' ? 'P' : 'V'}</span>
+            `;
+            
+            scheduleItem.appendChild(title);
+            scheduleItem.appendChild(details);
+            startCell.appendChild(scheduleItem);
+          }
+          
+          // Set height based on duration
+          scheduleItem.style.height = `${rowSpan * 100}%`;
+        });
+      });
+    });
+  }

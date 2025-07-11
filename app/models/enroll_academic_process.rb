@@ -54,6 +54,8 @@ class EnrollAcademicProcess < ApplicationRecord
   has_many :payment_reports, as: :payable, dependent: :destroy
   has_many :academic_records, dependent: :destroy
   has_many :sections, through: :academic_records
+  has_many :timetables, through: :sections
+  has_many :timeblocks, through: :timetables  
   has_many :schedules, through: :sections
   has_many :subjects, through: :sections
 

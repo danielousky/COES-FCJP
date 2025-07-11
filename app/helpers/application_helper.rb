@@ -58,7 +58,7 @@ module ApplicationHelper
 	end
 	
 	def button_add_section course_id
-		content_tag :button, 'data-bs-target': "#NewSectionModal", class: "btn btn-sm btn-success mx-1 addSection", "data-bs-toggle": :modal, course_id: course_id, onclick: "$('#_sectioncourse_id').val(this.attributes['course_id'].value);" do
+		content_tag :button, 'data-bs-target': "#NewSectionModal", class: "btn btn-sm btn-success mx-1 addSection", "data-bs-toggle": :modal, course_id: course_id, onclick: "$('#section_course_id').val(this.attributes['course_id'].value);" do		
 			capture_haml{"<i class='fas fa-plus'></i>".html_safe }
 		end
 		

@@ -65,9 +65,14 @@ class Section < ApplicationRecord
   has_many :grades, through: :enroll_academic_processes
   has_many :students, through: :grades
 
-
   # has_and_belongs_to_many :teachers#, class_name: 'SectionTeacher', dependent: :delete_all
   has_and_belongs_to_many :secondary_teachers, class_name: 'Teacher'
+
+  has_one :timetable, dependent: :destroy
+  accepts_nested_attributes_for :timetable, allow_destroy: true
+
+  has_many :timeblocks, through: :timetable#, dependent: :destroy
+  accepts_nested_attributes_for :timeblocks#, allow_destroy: true
 
   # has_many :secondary_teachers, through: :section_teachers, class_name: 'Teacher'
   # accepts_nested_attributes_for :section_teachers
@@ -127,7 +132,6 @@ class Section < ApplicationRecord
   scope :equivalence, -> {where('sections.modality': [:equivalencia_externa, :equivalencia_interna])}
 
   # FUNCTIONS:
-  # ATTENTION: FUNCTION TO PRINT COMMANDS BY CONSOLE 
 
   def has_teachers?
     !teacher.nil? or secondary_teachers.any?
@@ -230,7 +234,7 @@ class Section < ApplicationRecord
 
   def description_with_quotes
     aux = "[#{self.teacher.user.short_name}]" if self.teacher
-    schedule = "#{self.schedule_short_name}" if self.schedules
+    schedule = "#{self.schedule_short_name}" if self.timeblocks
     "#{code} #{aux} - #{schedule} (#{capacity_vs_enrolls})"
   end
 
@@ -309,19 +313,27 @@ class Section < ApplicationRecord
   end
 
   def schedule_name
-    schedules.map{|s| s.name}.to_sentence
+    timeblocks.map{|s| s.name}.to_sentence
   end
 
   def schedule_teacher_desc_short
       aux = ""
-      aux += schedules.any? ? schedule_short_name : 'Sin Horario Asignado'
+      aux += timeblocks.any? ? schedule_short_name : 'Sin Horario Asignado'
       aux += teacher ? " | #{teacher&.user&.reverse_name }" : " | Sin profesor Asignado"
-      aux += classroom.blank? ? " | Sin aula" : " | #{classroom}"
+      # aux += classroom.blank? ? " | Sin aula" : " | #{classroom}"
       return aux
   end
 
+  def schedules_short_desc_label
+    if timeblocks.any?
+      ApplicationController.helpers.label_status_with_tooltip 'bg-info', schedule_short_name, schedule_name
+    else
+      ApplicationController.helpers.label_status 'bg-secondary', 'Sin Horario'
+    end
+  end  
+
   def schedule_short_name
-    schedules.map{|s| s.short_name}.to_sentence    
+    timeblocks.map{|s| s.short_name}.to_sentence    
   end
 
   def teacher_desc 
@@ -329,7 +341,20 @@ class Section < ApplicationRecord
   end
 
   def schedule_table
-    schedules.each{|s| s.name}.to_sentence
+    timeblocks.each{|s| s.name}.to_sentence
+  end
+
+  def timetable_desc_with_link
+    if timeblocks.any?
+      aux = ApplicationController.helpers.link_to("/admin/section/#{self.id}", class: 'btn btn-sm btn-primary', 'data-bs-toggle': :tooltip, title: 'Editar Horario') do
+        '<i class="fa-solid fa-pencil"></i> '.html_safe
+      end
+      aux += " <div data-bs-toggle='tooltip' title='#{schedule_name}'>#{schedule_name}</div>".html_safe
+    else
+      ApplicationController.helpers.link_to("/admin/timetable/new?section_id=#{self.id}", class: 'btn btn-sm btn-success', 'data-bs-toggle': :tooltip, title: 'Agregar Horario') do
+        "<i class='fa-solid fa-plus'></i>".html_safe
+      end
+    end
   end
 
 
@@ -443,10 +468,10 @@ class Section < ApplicationRecord
         end
       end      
 
-      field :classroom do
-        filterable false 
-        sortable false
-      end
+      # field :classroom do
+      #   filterable false 
+      #   sortable false
+      # end
 
       field :teacher_desc do
         label 'Profesor'
@@ -479,8 +504,8 @@ class Section < ApplicationRecord
 
       # end
 
-      field :schedule_name do
-        label 'Horarios'
+      field :timeblocks do
+        label 'Horario'
       end
 
       field :capacity do
@@ -602,11 +627,11 @@ class Section < ApplicationRecord
         inline_add false
       end
 
-      field :classroom do
-        html_attributes do
-          {:onInput => "$(this).val($(this).val().toUpperCase().replace(/[^A-Za-z0-9| ]/g,''))"}
-        end
-      end
+      # field :classroom do
+      #   html_attributes do
+      #     {:onInput => "$(this).val($(this).val().toUpperCase().replace(/[^A-Za-z0-9| ]/g,''))"}
+      #   end
+      # end
 
       field :capacity do
         html_attributes do
@@ -614,7 +639,7 @@ class Section < ApplicationRecord
         end
       end
 
-      field :schedules
+      field :timetable
 
     end
 
@@ -646,11 +671,11 @@ class Section < ApplicationRecord
 
       field :qualified
 
-      field :classroom do
-        html_attributes do
-          {:onInput => "$(this).val($(this).val().toUpperCase().replace(/[^A-Za-z0-9| ]/g,''))"}
-        end
-      end
+      # field :classroom do
+      #   html_attributes do
+      #     {:onInput => "$(this).val($(this).val().toUpperCase().replace(/[^A-Za-z0-9| ]/g,''))"}
+      #   end
+      # end
 
       field :capacity do
         html_attributes do
@@ -658,13 +683,13 @@ class Section < ApplicationRecord
         end
       end
 
-      field :schedules
+      field :timetable
 
     end
 
 
     export do
-      fields :period, :area, :subject, :code, :classroom, :user, :qualified, :modality, :schedules, :capacity
+      fields :period, :area, :subject, :code, :classroom, :user, :qualified, :modality, :timeblocks, :capacity
 
       field :total_students do 
         label 'Total inscritos'
