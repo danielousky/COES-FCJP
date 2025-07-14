@@ -924,7 +924,7 @@ class AcademicRecord < ApplicationRecord
           'users.ci': row[0],
           'sections.code': [row[2], "0#{row[2]}"]
         )
-          total_updated = 1  if (fields[:overwrite] && (academic_record.set_status row[4] && academic_record.save))
+          total_updated = 1  if (fields[:overwrite] && (academic_record.set_status(row[4]) && academic_record.save))
       else
 
         period_type = PeriodType.find_by_code(type[0..1])
@@ -967,52 +967,49 @@ class AcademicRecord < ApplicationRecord
                 end
   
                 if s.save
+                  
+                  user = User.find_by(ci: row[0])
   
-                  ar = AcademicRecord.joins(:academic_process, :subject, :user, :section).where('subjects.id': subject.id, 'academic_processes.id': academic_process.id, 'users.ci': row[0], 'sections.code': row[2]).first
+                  if user && user.student?
+                    if stu = user.student
+                      grade = Grade.find_by(study_plan_id: study_plan.id, student_id: stu.id)
+                      if !grade.nil?
+                        enroll_academic_process = EnrollAcademicProcess.find_or_initialize_by(academic_process_id: academic_process.id, grade_id: grade.id)
+                        enroll_academic_process.set_default_values_by_import if enroll_academic_process.new_record?
   
-                  if fields[:overwrite] or (fields[:overwrite].nil? and ar.nil?) # ar.nil? or (!ar.nil? and fields[:overwrite]) # Es la misma pregunta pero preguntando por ar
-  
-                    user = User.find_by(ci: row[0])
-    
-                    if user && user.student?
-                      if stu = user.student
-                        grade = Grade.find_by(study_plan_id: study_plan.id, student_id: stu.id)
-                        if !grade.nil?
-                          enroll_academic_process = EnrollAcademicProcess.find_or_initialize_by(academic_process_id: academic_process.id, grade_id: grade.id)
-                          enroll_academic_process.set_default_values_by_import if enroll_academic_process.new_record?
-    
-                          if enroll_academic_process.save
-                            academic_record = AcademicRecord.where(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id).first
-                            if academic_record.nil? and fields[:overwrite]
-                              academic_record = AcademicRecord.new(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id)
-                              if academic_record.save
-                                total_newed = 1
-                              else
-                                raise academic_record.errors.full_messages.to_sentence.truncate(15)
-                              end
+                        if enroll_academic_process.save
+                          academic_record = AcademicRecord.where(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id).first
+                          if academic_record.nil?
+                            
+                            academic_record = AcademicRecord.new(section_id: s.id, enroll_academic_process_id: enroll_academic_process.id)
+                            if academic_record.save
+                              total_newed = 1
                             else
-                              total_updated = 1 if fields[:overwrite]
-                            end
-    
-                            if row[4] && (total_newed.eql?(1) || (total_updated.eql?(1) and fields[:overwrite]))
-                              calificacion_correcta = academic_record.set_status row[4]
-                              unless (calificacion_correcta.eql?(true) && academic_record.save)
-                                raise "Calificación: (academic_record status: #{academic_record.status}) (calificacion_correcta: #{calificacion_correcta}). #{academic_record.errors.full_messages.to_sentence}"
-                              end
+                              raise academic_record.errors.full_messages.to_sentence.truncate(15)
                             end
                           else
-                            raise "EnrollAcademicProcess: #{enroll_academic_process.errors.full_messages.to_sentence}"
+                            total_updated = 1 if fields[:overwrite]
+                          end
+  
+                          if row[4] && (total_newed.eql?(1) || (total_updated.eql?(1) and fields[:overwrite]))
+                            calificacion_correcta = academic_record.set_status row[4]
+                            unless (calificacion_correcta.eql?(true) && academic_record.save)
+                              raise "Calificación: (academic_record status: #{academic_record.status}) (calificacion_correcta: #{calificacion_correcta}). #{academic_record.errors.full_messages.to_sentence}"
+                            end
                           end
                         else
-                          raise "Grado no encontrado para el estudiante: #{stu.name} (#{user.ci})"
+                          raise "EnrollAcademicProcess: #{enroll_academic_process.errors.full_messages.to_sentence}"
                         end
                       else
-                        raise "Estudiante no encontrado: #{user.ci} - #{user.first_name} #{user.last_name}"
+                        raise "Grado no encontrado para el estudiante: #{stu.name} (#{user.ci})"
                       end
                     else
-                      raise "Usuario no encontrado: #{row[0]}"
+                      raise "Estudiante no encontrado: #{user.ci} - #{user.first_name} #{user.last_name}"
                     end
+                  else
+                    raise "Usuario no encontrado: #{row[0]}"
                   end
+
                 else
                   raise "Sección: #{s.errors.full_messages.to_sentence}"
                 end
