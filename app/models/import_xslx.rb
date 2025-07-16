@@ -44,7 +44,7 @@ class ImportXslx
 					total_newed += sum_newed
 					total_updated += sum_updated
 					
-					break if errors.count > 20
+					# break if errors.count > 20
 					if i >= fields[:limit].to_i
 						errors << 'limit_records'
 						break
