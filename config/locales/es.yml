@@ -842,6 +842,7 @@ es:
         grades: Expedientes
         students: Estudiantes
         schedules: Horarios
+        timetable: Horario
         classroom: 'Aula'
         secondary_teachers: 'Profesores secundarios'
         created_at: Fecha Creación
@@ -907,6 +908,15 @@ es:
         user: 'Usuario'
         created_at: 'Fecha de Registro'
         sections: 'Secciones'
+      timetable:
+        timeblocks: Bloques horarios
+      timeblock:
+        day: Día
+        start_time: Hora Inicio
+        end_time: Hora Fin
+        modality: Modalidad
+        teacher: Profesor
+        classroom: Aula
       group_tutorial:
         id: 'Módulo N°'
         group_tutorial: 'Módulo de Tutoriales'

@@ -648,6 +648,7 @@ class Section < ApplicationRecord
       field :course do
         read_only true
       end
+      field :qualified
       
       field :code do
         help 'Identificador'
@@ -669,7 +670,6 @@ class Section < ApplicationRecord
         inline_add false
       end
 
-      field :qualified
 
       # field :classroom do
       #   html_attributes do
