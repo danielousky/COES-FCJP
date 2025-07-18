@@ -3,7 +3,8 @@
     - field.enum.each do |at|
       %label.btn.btn-info
         =# form.radio_button field.method_name, at[1], checked: field.form_value.eql?(at[1])
-        = form.radio_button field.method_name, at[0], checked: field.form_value.eql?(at[0])
+        - val = (field.method_name.to_s.include? 'day' or field.method_name.to_s.include? 'modality') ? at[0] : at[1]
+        = form.radio_button field.method_name, val, checked: field.form_value.eql?(at[1])
         = at[0]&.titleize
 - else
   - js_data = {xhr: false, sortable: false, cacheAll: true, regional: {add: t("admin.misc.add_new"), chooseAll: t("admin.misc.chose_all"), clearAll: t("admin.misc.clear_all"), down: t("admin.misc.down"), remove: t("admin.misc.remove"), search: t("admin.misc.search"), up: t("admin.misc.up")}}

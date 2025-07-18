@@ -33,7 +33,7 @@ class Timeblock < ApplicationRecord
   ALLWOED_END= 21
 
   enum modality: { Presencial: 0, Virtual: 1 }
-  enum day: { Lunes: 0, Martes: 1, Miércoles: 2, Jueves: 3, Viernes: 4, Sábado: 5 }
+  enum day: {Lunes: 0, Martes: 1, Miercoles: 2, Jueves: 3, Viernes: 4, Sabado: 5}
 
   validates :day, presence: true
   validates :start_time, presence: true
@@ -173,7 +173,7 @@ class Timeblock < ApplicationRecord
       end
     end
     edit do
-      field :day, :enum
+      field :day
       field :start_time do
         html_attributes do
           { step: '900' } # 15 minutes step
