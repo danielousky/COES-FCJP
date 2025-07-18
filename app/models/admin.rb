@@ -212,6 +212,7 @@ class Admin < ApplicationRecord
   rails_admin do
     navigation_label 'Gestión de Usuarios'
     navigation_icon 'fa-regular fa-user-tie'
+    weight -4
 
     show do
       field :user 

@@ -96,6 +96,7 @@ class Teacher < ApplicationRecord
   rails_admin do
     navigation_label 'Gestión de Usuarios'
     navigation_icon 'fa-regular fa-chalkboard-user'
+    weight -4
 
     list do
       sort_by :school

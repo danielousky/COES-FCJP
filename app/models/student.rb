@@ -189,7 +189,7 @@ class Student < ApplicationRecord
   rails_admin do
     navigation_label 'Gestión de Usuarios'
     navigation_icon 'fa-regular fa-user-graduate'
-    weight 4
+    weight -4
 
     edit do
       field :user
