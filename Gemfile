@@ -80,6 +80,8 @@ group :development, :production do
   # Autorization
   gem 'cancancan'
 
+  gem 'concurrent-ruby', '1.3.4'
+
   # gem 'xlsxtream'
   # Administration
   gem 'rails_admin', '~> 3.1'#, '>= 3.1.2'
