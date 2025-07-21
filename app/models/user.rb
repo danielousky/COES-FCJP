@@ -405,6 +405,8 @@ class User < ApplicationRecord
       items_per_page 10
       checkboxes false
       search_by :my_search #[:email, :first_name, :last_name, :ci]
+
+      
       field :ci do
         label 'Cédula'
         sticky true
@@ -417,6 +419,7 @@ class User < ApplicationRecord
       field :first_name
       field :last_name
       field :profile_picture
+      field :sign_in_count
       field :link_to_reset_password do
         label 'Opciones'
         visible do
@@ -435,6 +438,7 @@ class User < ApplicationRecord
       field :last_name 
       field :number_phone 
       field :sex
+      field :sign_in_count
     end
 
     import do

@@ -86,6 +86,7 @@ class Student < ApplicationRecord
   scope :custom_search, -> (keyword) { joins(:user).where("users.ci ILIKE '%#{keyword}%' OR users.email ILIKE '%#{keyword}%' OR users.first_name ILIKE '%#{keyword}%' OR users.last_name ILIKE '%#{keyword}%' OR users.number_phone ILIKE '%#{keyword}%'") }
 
   scope :find_by_user_ci, -> (ci) {joins(:user).where('users.ci': ci).first}
+  scope :with_user, -> { joins(:user) }
 
   # CALLBACKS:
   after_destroy :check_user_for_destroy
@@ -124,6 +125,10 @@ class Student < ApplicationRecord
     file = File.read("#{Rails.root}/public/countriesToCities.json")
 
     JSON.parse(file)
+  end
+
+  def user_sign_in_count
+    user&.sign_in_count    
   end
 
   def name
@@ -233,6 +238,7 @@ class Student < ApplicationRecord
     end
 
     list do
+      scopes [:with_user]
       search_by :custom_search
       checkboxes false
       filters [:schools]
@@ -334,9 +340,12 @@ class Student < ApplicationRecord
 
       field :created_at
 
-      # field :roles do
-      #   label 'Roles'
-      # end
+
+      field :user_sign_in_count, :integer do
+        label 'Ingresos a Coes'
+        sortable 'users.sign_in_count'
+        queryable 'users.sign_in_count'
+      end
 
       field :link_to_reset_password do
         label 'Opciones'
@@ -345,7 +354,6 @@ class Student < ApplicationRecord
           user&.admin&.authorized_manage? 'Student'
         end
       end
-
     end
 
     export do

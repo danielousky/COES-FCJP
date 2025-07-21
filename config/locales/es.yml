@@ -944,6 +944,7 @@ es:
         sex: 'Sexo'
         profile_picture: 'Foto de Perfil'
         ci_image: 'Imagen de CI'
+        sign_in_count: Ingresos a Coes
     scopes:
       academic_process:
         Semestral: S
