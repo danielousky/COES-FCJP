@@ -29,6 +29,7 @@ class SubjectType < ApplicationRecord
 
   # RAILS_ADMIN:
   rails_admin do
+    visible false
     list do
       fields :code, :name
     end

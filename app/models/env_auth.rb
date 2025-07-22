@@ -34,6 +34,7 @@ class EnvAuth < ApplicationRecord
         "#{ApplicationController.helpers.translate_model(env_authorizable_type.downcase, 'one')}: #{env_authorizable.name}"
     end
     rails_admin do
+        visible false
 
         edit do
             field :env_authorizable
