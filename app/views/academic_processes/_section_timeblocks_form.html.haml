@@ -14,7 +14,7 @@
           - days = [['Lunes', 0], ['Martes', 1], ['Miércoles', 2], ['Jueves', 3], ['Viernes', 4], ['Sábado', 5]]
           - days.each_with_index do |(day_name, day_value), idx|
             %label.btn.btn-info
-              = radio_button_tag 'section[timetable_attributes][timeblocks_attributes][new_timeblocks][day]', day_name, idx == 0, id: "section_timetable_attributes_timeblocks_attributes_day_#{day_value}"
+              = radio_button_tag 'section[timetable_attributes][timeblocks_attributes][new_timeblocks][day]', day_value, idx == 0, id: "section_timetable_attributes_timeblocks_attributes_day_#{day_value}"
               = day_name
         .form-text
           %span.label.label-danger Requerido
