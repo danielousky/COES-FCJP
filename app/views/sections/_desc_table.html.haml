@@ -23,7 +23,7 @@
       %td{'data-bs-toggle': :tooltip, title: section.subject.desc}
         - if section.subject
           - if current_user&.admin&.authorized_manage? 'Subject'
-            %a{href: "/admin/subject/#{section.subject_id}"}= section.course.subject_desc_with_pci 
+            %a{href: "/admin/subject/#{section.subject&.id}"}= section.course.subject_desc_with_pci 
           - else
             = section.course.subject_desc_with_pci
       - teacher_desc = section.teacher.desc if section.teacher
@@ -43,7 +43,7 @@
       %td
         .badge.bg-secondary= section.total_academic_records
         de
-        .badge.bg-info= section.capacity
+        .badge.bg-info.text-dark= section.capacity
       %td
         = section.label_qualified
         - if session[:rol].eql? 'admin' and current_user&.admin&.authorized_manage? 'Seccion'
