@@ -95,7 +95,7 @@
                   %i.fa.fa-eraser{'data-bs-toggle': :tooltip, title: 'Limpiar valores', onclick: "reset(this);", id_obj: acre_id, class: 'eraser'}
             = render partial: '/academic_records/qualification_to_s', locals: {academic_record: acre, id: acre_id}
           %td.text-center
-            .badge.bg-info{id: "labelStatus#{acre_id}"}= status.titleize
+            .badge.bg-info.text-dark{id: "labelStatus#{acre_id}"}= status.titleize
 
 :javascript
 

@@ -15,7 +15,7 @@
       %th= academic_process.school.short_name
       %th= academic_process.process_name
       %th
-        .label.bg-info= academic_process.modality.titleize
+        .label.bg-info.text-dark= academic_process.modality.titleize
       %th= academic_process.max_credits
       %th.text-center= academic_process.max_subjects
       - linked = (current_user&.admin&.authorized_read? 'EnrollAcademicProcess')

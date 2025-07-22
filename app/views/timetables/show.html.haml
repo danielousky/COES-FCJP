@@ -48,7 +48,7 @@
                                     %div= slot[:classroom]
                                     %div= slot[:teacher]
                                     %p.small.text-center= slot[:academic_process]
-                                    %span.badge.bg-info.float-end= slot[:modality]
+                                    %span.badge.bg-info.text-dark.float-end= slot[:modality]
             
             .timetable-list.d-none
               .list-group
@@ -66,7 +66,7 @@
                             = slot[:classroom]
                           %small
                             = slot[:teacher]
-                            %span.badge.bg-info.ms-2= slot[:modality]
+                            %span.badge.bg-info.text-dark.ms-2= slot[:modality]
                   - else
                     .list-group-item.text-muted No hay clases programadas
 
@@ -128,7 +128,7 @@
               <div>${slot.start_time} - ${slot.end_time}</div>
               <div>${slot.classroom}</div>
               <div>${slot.teacher}</div>
-              <span class="badge bg-info">${slot.modality === 'Presencial' ? 'P' : 'V'}</span>
+              <span class="badge bg-info text-dark">${slot.modality === 'Presencial' ? 'P' : 'V'}</span>
             `;
             
             scheduleItem.appendChild(title);
