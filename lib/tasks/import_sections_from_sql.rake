@@ -62,6 +62,7 @@ namespace :import do
 
         # Buscar subject
         subject = Subject.where(code: subject_code).or(Subject.where(code: "0#{subject_code}")).first
+        subject ||= Subject.where(code: '0401001501').first if (subject_code.eql? '0401011501')
         unless subject
 
           puts "Subject no encontrado: (#{subject_code})"
