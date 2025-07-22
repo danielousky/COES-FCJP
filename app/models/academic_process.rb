@@ -50,7 +50,7 @@ class AcademicProcess < ApplicationRecord
   belongs_to :period
   has_one :period_type, through: :period
 
-  belongs_to :process_before, class_name: 'AcademicProcess', optional: true, dependent: :delete
+  belongs_to :process_before, class_name: 'AcademicProcess', optional: true#, dependent: :destroy
 
   #has_many:
   has_many :enrollment_days, dependent: :destroy
@@ -65,7 +65,7 @@ class AcademicProcess < ApplicationRecord
   has_many :subjects, through: :courses
 
   # ENUMERIZE:
-  enum modality: [:Semestral, :Anual, :Intensivo, :Unico]
+  enum modality: [:Semestral, :Anual, :Intensivo]
 
   #VALIDATIONS:
   validates :school, presence: true
@@ -368,16 +368,18 @@ class AcademicProcess < ApplicationRecord
       items_per_page 12
       checkboxes false
       sort_by 'periods.name'
-      filters [:school, :period]
+
 
       field :school do
+        visible do
+          bindings[:view]._current_user&.admin&.schools_auh&.count.to_i > 1
+        end
         sticky true
         column_width 150
 
         pretty_value do
           value.short_name
         end        
-        
       end
       
       fields :period do
@@ -388,6 +390,7 @@ class AcademicProcess < ApplicationRecord
           # value.name
           bindings[:object]&.process_name
         end
+        filterable false
       end
 
       field :process_before do
@@ -395,6 +398,7 @@ class AcademicProcess < ApplicationRecord
         pretty_value do
           bindings[:object]&.process_before&.process_name
         end
+        filterable false
       end
 
       # EVALUAR SI VALE LA PENA INCLUIRLA AQUÍ
@@ -407,6 +411,7 @@ class AcademicProcess < ApplicationRecord
       # end
       field :enroll do
         label 'Inscripción'
+        filterable false
         # pretty_value do
         #   "#{bindings[:object].label_active} p".html_safe
         # end
@@ -422,6 +427,7 @@ class AcademicProcess < ApplicationRecord
 
       field :payments_active do
         label 'Pagos'
+        filterable false
         pretty_value do
           current_user = bindings[:view]._current_user
           if current_user&.admin&.authorized_manage? 'AcademicProcess'
@@ -434,6 +440,7 @@ class AcademicProcess < ApplicationRecord
 
       field :active do
         label 'Activo'
+        filterable false
         pretty_value do
           current_user = bindings[:view]._current_user
           if current_user&.admin&.authorized_manage? 'AcademicProcess'
@@ -446,6 +453,7 @@ class AcademicProcess < ApplicationRecord
 
       field :post_qualification do
         label 'Cal. Posterior'
+        filterable false
 
         pretty_value do
           if GeneralSetup.enabled_post_qualification?
@@ -493,10 +501,10 @@ class AcademicProcess < ApplicationRecord
           if (user and user.admin and user.admin.authorized_read? 'AcademicRecord')
 
             link = "/admin/academic_record?f[school][03085][o]=like&f[school][03085][v]=#{bindings[:object].school&.short_name}&f[academic_process][03111][o]=like&f[academic_process][03111][v]=#{bindings[:object].process_name}"
-            a = %{<a href=#{link} data-bs-toggle='tooltip' title='Total Inscripciones En Asignaturas'><span class='badge bg-info'>#{value}</span></a>}.html_safe
+            a = %{<a href=#{link} data-bs-toggle='tooltip' title='Total Inscripciones En Asignaturas'><span class='badge bg-info text-dark'>#{value}</span></a>}.html_safe
             "#{a} #{ApplicationController.helpers.link_academic_records_csv bindings[:object]}".html_safe
           else
-            %{<span class='badge bg-info'>#{value}</span>}.html_safe
+            %{<span class='badge bg-info text-dark'>#{value}</span>}.html_safe
           end
         end
       end
@@ -509,10 +517,10 @@ class AcademicProcess < ApplicationRecord
           total = bindings[:object].enroll_academic_processes.count
           if (user&.admin&.authorized_read? 'EnrollAcademicProcess')
             link = "/admin/enroll_academic_process?f[school][99071][o]=like&f[school][99071][v]=#{bindings[:object].school&.short_name}&f[academic_process][99124][o]=like&f[academic_process][99124][v]=#{bindings[:object].process_name}"
-            a = %{<a href=#{link} data-bs-toggle='tooltip' title='Total Inscripciones En Periodo'><span class='badge bg-info'>#{total}</span></a>}.html_safe
+            a = %{<a href=#{link} data-bs-toggle='tooltip' title='Total Inscripciones En Periodo'><span class='badge bg-info text-dark'>#{total}</span></a>}.html_safe
             "#{a} #{ApplicationController.helpers.link_enroll_academic_process_csv bindings[:object]}".html_safe
           else
-            %{<span class='badge bg-info'>#{value}</span>}.html_safe
+            %{<span class='badge bg-info text-dark'>#{value}</span>}.html_safe
           end
         end
       end      
@@ -546,7 +554,8 @@ class AcademicProcess < ApplicationRecord
         inline_add false
         help 'Atención: Aún cuando este campo no es obligatorio y puede ser omitido es muy importante para las Citas Horarias e Inscripciones'
 
-        partial 'academic_process/custom_academic_process_id_field'
+        # partial 'academic_process/custom_academic_process_id_field'
+        # Atención: En el caso de la FCJP, no es necesario particularizar ya que, los que manejan esta sección siempre estárá segmentado ya por la escuela de su entorno e
         
       end
 
@@ -591,7 +600,8 @@ class AcademicProcess < ApplicationRecord
         inline_add false
         help 'Atención: Aún cuando este campo no es obligatorio y puede ser omitido es indispensable para las generación de Citas Horarias, Programaciones e Inscripciones'
 
-        partial 'academic_process/custom_academic_process_id_field'
+        # partial 'academic_process/custom_academic_process_id_field'
+        # Atención: En el caso de la FCJP, no es necesario particularizar ya que, los que manejan esta sección siempre estárá segmentado ya por la escuela de su entorno e
         
       end
 
