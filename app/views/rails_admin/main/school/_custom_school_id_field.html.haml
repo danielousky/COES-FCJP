@@ -6,6 +6,9 @@
 - else 
     - schools_auh = _current_user&.admin&.schools_auh
     - if schools_auh.count.eql? 1
-        = collection_select model, 'school_id', schools_auh, :id, :name, {selected: schools_auh.first.id }, {class: 'input-group form-control required', required: true}
+        - school = schools_auh.first
+        =# collection_select model, 'school_id', schools_auh, :id, :name, {selected: schools_auh.first.id }, {class: 'input-group form-control required', required: true}
+        = hidden_field model, 'school_id', value: school.id
+        = school.short_name
     - else
         = collection_select model, 'school_id', schools_auh, :id, :name, {include_blank: 'Seleccione...', selected: @object.school_id}, {class: 'input-group form-control required', required: true}
