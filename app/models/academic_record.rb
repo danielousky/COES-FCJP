@@ -598,7 +598,7 @@ class AcademicRecord < ApplicationRecord
 
   # RAILS_ADMIN
   rails_admin do
-    navigation_label 'Reportes'
+    navigation_label 'Config Específica'
     navigation_icon 'fa-solid fa-signature'
     weight 1
     # visible false
@@ -629,12 +629,12 @@ class AcademicRecord < ApplicationRecord
         associated_collection_scope do
           Proc.new { |scope|
             scope = scope.joins(:school)
-            scope = scope.limit(30) # 'order' does not work here
+            scope = scope.limit(2)
           }
         end
-        
-        searchable :name
+        # searchable :name  # <-- ¡COMENTA O ELIMINA ESTA LÍNEA!
         sortable :name
+        filterable true #School.limit(2).map { |s| [s.id, s.name] }.to_h
       end
 
 

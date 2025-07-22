@@ -117,7 +117,8 @@ class Course < ApplicationRecord
 
   rails_admin do
     # visible false
-    navigation_label 'Reportes'
+
+    navigation_label 'Config Específica'
     navigation_icon 'fa-solid fa-shapes'
     weight -2
 
@@ -129,13 +130,47 @@ class Course < ApplicationRecord
     list do
       sort_by ['courses.name']
       search_by :custom_search
+      checkboxes false
+      # Las opciones seteables para `list` en RailsAdmin incluyen, entre otras:
+      # - items_per_page: para definir la cantidad de elementos por página.
+      # - sort_by: para definir el campo o los campos por los cuales ordenar.
+      # - sort_reverse: para invertir el orden de la lista.
+      # - filters: para definir los filtros disponibles.
+      # - search_by: para definir los campos de búsqueda personalizada.
+      # - checkboxes: para mostrar o no los checkboxes de selección múltiple.
+      # - scopes: para agregar scopes personalizados a la lista.
+      # - field: para definir los campos que se mostrarán y sus opciones.
+
+      # - group: para agrupar campos en la vista de lista.
+
+      # Agregar el campo school solo si el usuario actual tiene más de una escuela autorizada
+      field :school do
+        sticky true
+        visible do
+          bindings[:view]._current_user&.admin&.schools_auh&.count.to_i > 1
+        end
+        associated_collection_cache_all true
+        associated_collection_scope do
+          Proc.new { |scope|
+            scope = scope.joins(:school)
+            scope = scope.limit(2)
+          }
+        end
+        
+        filterable true
+        label 'Escuela'
+        pretty_value do
+          value&.short_name
+        end
+      end
+
       field :academic_process do
         sticky true
         queryable true
         label 'Periodo'
         column_width 150
         pretty_value do
-          value.name
+          value.process_name
         end
       end
       field :area do
