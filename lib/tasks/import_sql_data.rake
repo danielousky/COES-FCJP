@@ -117,8 +117,8 @@ namespace :import do
                       print "NewAR √"
                   end
 
-                  register_partial_qualification(academic_record, :primer_lapso, data[3])
-                  register_partial_qualification(academic_record, :segundo_lapso, data[4])
+                  # register_partial_qualification(academic_record, :primer_lapso, data[3])
+                  # register_partial_qualification(academic_record, :segundo_lapso, data[4])
 
                 else
                   p "No se pudo guardar AcademicRecord para: #{student.user.ci} - #{subject.name} - #{section_letter.upcase}: #{academic_record.errors.full_messages.to_sentence}"
