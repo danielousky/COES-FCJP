@@ -86,7 +86,7 @@ class School < ApplicationRecord
   validates :name, presence: true, uniqueness: {case_sensitive: false}
 
   # CALLBAKCS:
-  after_initialize :set_unique_faculty
+  # after_initialize :set_unique_faculty
   before_save :clean_name_and_code
 
   # HOOKS:
