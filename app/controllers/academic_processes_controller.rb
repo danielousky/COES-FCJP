@@ -145,7 +145,7 @@ class AcademicProcessesController < ApplicationController
                 if params[:schedules] and section.timetable
                   tt_aux = section.timetable.dup
                   tt_aux.section_id = nueva_seccion.id
-                  if tt_aux.save
+                  if tt_aux.save(validate: false)
                     section.timetable.timeblocks.each do |tb|
                       tb_aux = tb.dup
                       tb_aux.timetable_id = tt_aux.id
