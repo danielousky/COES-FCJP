@@ -5,7 +5,7 @@ namespace :import do
     require 'open-uri'
     require 'i18n'
 
-    file_path = 'https://coesfcjp-space.nyc3.cdn.digitaloceanspaces.com/uxxi_reg_2024_2025%20-%2028%20julio%202025.sql'
+    file_path = 'https://coesfcjp-space.nyc3.cdn.digitaloceanspaces.com/uxxi_reg_2024_2025_28_julio_2025.sql'
     table_name = nil
     columns = []
     values = []

@@ -3,8 +3,12 @@ namespace :import do
   task sections_from_sql: :environment do
     require 'open-uri'
 
-    file_path = 'https://coesfcjp-space.nyc3.cdn.digitaloceanspaces.com/uxxi_reg_2024_2025%20-%2028%20julio%202025.sql'
+    # file_path = 'https://coesfcjp-space.nyc3.cdn.digitaloceanspaces.com/uxxi_reg_2024_2025%20-%2028%20julio%202025.sql'
+    file_path = 'https://coesfcjp-space.nyc3.cdn.digitaloceanspaces.com/uxxi_reg_2024_2025_28_julio_2025.sql'
+
+    # file_path = "/Users/danielmoros/Downloads/uxxi_reg_2024_2025 - 28 julio 2025.sql"
     found_create = false
+    
 
     # Ajusta estos valores según tu lógica de curso/período
     academic_process = AcademicProcess.find 10
