@@ -7,6 +7,8 @@
   %h1 COES
     
   %p
+    - if @user&.student&.address.nil?
+      Le invitamos amablemente a completar sus datos personales, académicos y de contacto.
     Puede ingresas haciendo clíc en el siguiente enlace: 
     = link_to 'coesfcjp.com', 'https://coesfcjp.com'
     e ingresar con el número de su cédula de identidad en ambos campos

@@ -12,6 +12,7 @@ class UserMailer < ApplicationMailer
   #end
   
   def welcome user
+    @user = user
     mail(to: user.email_desc, subject: "¡Bienvenido a Coes!")
   end
 
