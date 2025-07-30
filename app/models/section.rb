@@ -442,12 +442,12 @@ class Section < ApplicationRecord
       field :subject do
         sticky true
         label 'Asignatura'
-        column_width 60
+        column_width 250
         searchable :code
         filterable :code #'subjects.code'
         sortable :code
         pretty_value do
-          value.code
+          value.desc
         end
       end
 
