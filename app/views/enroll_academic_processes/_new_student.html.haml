@@ -36,7 +36,7 @@
     %h5.text-center.bg-success.text-light.py-2.mt-0.animate__animated.animate__fadeIn= academic_process.title_to_enroll_process
     .p-2
 
-      - if inscripcion&.confirmado?
+      - if false #inscripcion&.confirmado?
         - msg = 'Generar Constancia de Inscripción'
         .text-center
           = link_to "/enroll_academic_processes/#{inscripcion.id}.pdf", class: 'btn btn-primary text-center btn-lg align-middle', target: '_blank', rel: "noopener noreferrer", 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
@@ -46,63 +46,65 @@
 
       -# Ocultamiento temporal de la validación de inscripción por ser el primer proceso y no tener historicos totales
       -# if inscripcion&.reservado? or @grade.valid_to_enroll_in academic_process #Antes 
+
       - if inscripcion&.reservado? or inscripcion.nil? #@grade.valid_to_enroll_in academic_process
-        - # "REGULAR"
-        - # ROYER RABIT 
-        = render partial: '/grades/regulation'
+        - if inscripcion&.reservado? or inscripcion.nil? #@grade.valid_to_enroll_in academic_process
+          - # "REGULAR"
+          - # ROYER RABIT 
+          = render partial: '/grades/regulation'
 
-        - if (inscripcion.nil? or inscripcion&.reservado?)
-          - # PROCESO DE INSCRIPCIÓN NO COMPLETADO
-          - if academic_process.enroll_instructions
-            .border.m-2.p-2.text-center
-              = raw academic_process.enroll_instructions
+          - if (inscripcion.nil? or inscripcion&.reservado?)
+            - # PROCESO DE INSCRIPCIÓN NO COMPLETADO
+            - if academic_process.enroll_instructions
+              .border.m-2.p-2.text-center
+                = raw academic_process.enroll_instructions
 
-          - if academic_process.enrollment_days.any?
-            - # PLANIFICACIÓN POR CITA HORARIA
-            - if @grade.has_a_appointment_time?
-              - if @grade.can_enroll_by_apponintment?
-                - if inscripcion&.reservado?
-                  - # INSCRIPCIÓN EN PROCESO
-                  = render partial: '/enroll_academic_processes/msg_enroll_in_progress'
+            - if academic_process.enrollment_days.any?
+              - # PLANIFICACIÓN POR CITA HORARIA
+              - if @grade.has_a_appointment_time?
+                - if @grade.can_enroll_by_apponintment?
+                  - if inscripcion&.reservado?
+                    - # INSCRIPCIÓN EN PROCESO
+                    = render partial: '/enroll_academic_processes/msg_enroll_in_progress'
 
-                - # MOMENTO DE INSCRIBIRSE (It's Time!)
-                = render partial: '/grades/msg_its_time_to_enroll'
-                - # Incluir cuenta regresiva js
+                  - # MOMENTO DE INSCRIBIRSE (It's Time!)
+                  = render partial: '/grades/msg_its_time_to_enroll'
+                  - # Incluir cuenta regresiva js
 
-                - enabled_to_enroll = true
-              - elsif (@grade.enroll_is_in_future? and inscripcion.nil?)
-                - # message future enrollment_day:
-                = render partial: 'grades/msg_appointment_time'
-              - else
-                = render partial: 'enroll_academic_processes/msg_the_time_to_enroll_passed'
+                  - enabled_to_enroll = true
+                - elsif (@grade.enroll_is_in_future? and inscripcion.nil?)
+                  - # message future enrollment_day:
+                  = render partial: 'grades/msg_appointment_time'
+                - else
+                  = render partial: 'enroll_academic_processes/msg_the_time_to_enroll_passed'
 
-          - else
-            - # PLANIFICACION DIRECTA, SIN CITA HORARIA
-            - enabled_to_enroll = true
+            - else
+              - # PLANIFICACION DIRECTA, SIN CITA HORARIA
+              - enabled_to_enroll = true
 
-        - if enabled_to_enroll
-          - @academic_process = academic_process
-          .m-3.p-3.text-center= render template: 'enroll_academic_processes/new'
-      - elsif ['articulo3', 'articulo6', 'articulo7'].include? @grade.current_permanence_status
-        - # ROYER RABIT
-        = render partial: '/grades/regulation'
-      - elsif ['intercambio', 'egresado', 'egresado_doble_titulo'].include? @grade.current_permanence_status
-        .alert.alert-warning
-          %b ATENCIÓN:
-          Si desea inscribirse debe realizarlo directamente por Control de Estudio.
-          = @grade.help_msg
-      - elsif ['desertor', 'permiso_para_no_cursar'].include? @grade.current_permanence_status
-        .alert.alert-danger 
-          %b ATENCIÓN: 
-          Su estado actual de permanencia lo imposibilita para inscribirse. Contacte al personal de Control de Estudio de la escuela para solventar su situación si considera que el caso lo amerita.
-          = @grade.help_msg
-      - elsif (academic_process_before and !@grade.enroll_academic_processes.of_academic_process(academic_process_before.id).any?)
-        .alert.alert-danger 
-          %b ATENCIÓN: 
-          = "Usted no se inscribió en el período anterior (#{academic_process_before&.process_name}) por lo que su preinscripción no podrá realizarse por esta vía. Debe dirigirse a Control de Estudio para solventar su situación."
-          = @grade.help_msg
+          - if enabled_to_enroll
+            - @academic_process = academic_process
+            .m-3.p-3.text-center= render template: 'enroll_academic_processes/new'
+        - elsif ['articulo3', 'articulo6', 'articulo7'].include? @grade.current_permanence_status
+          - # ROYER RABIT
+          = render partial: '/grades/regulation'
+        - elsif ['intercambio', 'egresado', 'egresado_doble_titulo'].include? @grade.current_permanence_status
+          .alert.alert-warning
+            %b ATENCIÓN:
+            Si desea inscribirse debe realizarlo directamente por Control de Estudio.
+            = @grade.help_msg
+        - elsif ['desertor', 'permiso_para_no_cursar'].include? @grade.current_permanence_status
+          .alert.alert-danger 
+            %b ATENCIÓN: 
+            Su estado actual de permanencia lo imposibilita para inscribirse. Contacte al personal de Control de Estudio de la escuela para solventar su situación si considera que el caso lo amerita.
+            = @grade.help_msg
+        - elsif (academic_process_before and !@grade.enroll_academic_processes.of_academic_process(academic_process_before.id).any?)
+          .alert.alert-danger 
+            %b ATENCIÓN: 
+            = "Usted no se inscribió en el período anterior (#{academic_process_before&.process_name}) por lo que su preinscripción no podrá realizarse por esta vía. Debe dirigirse a Control de Estudio para solventar su situación."
+            = @grade.help_msg
 
-      - else
-        %h4.alert.alert-danger
-          %b ATENCIÓN:
-          Comuníquese con el personal de Control de Estudio para que le permita realizar su preinscripción
+        - else
+          %h4.alert.alert-danger
+            %b ATENCIÓN:
+            Comuníquese con el personal de Control de Estudio para que le permita realizar su preinscripción
