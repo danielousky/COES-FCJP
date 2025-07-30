@@ -12,7 +12,7 @@
         .alert.alert-danger.text-center
           %h4.bg-danger.text-light.p-2.fa-fade Reporte Pago Pendiente
           %b ¡Atención!
-          Debe realizar el pago de su inscripción para posteriormente reportarlo. A Continuación los necesarios 
+          Debe realizar el pago de su inscripción para posteriormente reportarlo. A Continuación los datos necesarios: 
           - bank_accounts = school.bank_accounts.any? ? school.bank_accounts : faculty.bank_accounts
           = render partial: '/payment_reports/show_data_bank_account', locals: {bank_accounts: bank_accounts, amount: inscripcion.pay_amount}
 
