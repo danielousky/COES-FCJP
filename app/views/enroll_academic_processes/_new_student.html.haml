@@ -25,14 +25,12 @@
       - content = render partial: "/payment_reports/form"
       = render partial: '/layouts/scaffold-modal', locals: {content: content, title: titlePayment, id: id}
 
-- school.academic_processes.where(modality: @grade.study_plan_modality).enrolls.each do |academic_process|
+
+- school.academic_processes.enrolls.each do |academic_process|
   - academic_process_before = academic_process&.process_before
   - # INSCRIPCIÓN ABIERTA!
   .border.border-success.mb-3
-    - title = "PROCESO DE INSCRIPCIÓN #{academic_process&.process_name} - #{school&.name} "
-    - if academic_process.enrollment_days&.of_today.first&.active_now?
-      - title += " CON CITA HORARIA"
-    %h5.text-center.bg-success.text-light.py-2.mt-0= title
+    %h5.text-center.bg-success.text-light.py-2.mt-0.animate__animated.animate__fadeIn= academic_process.title_to_enroll_process
     .p-2
       - inscripcion = @grade.enroll_academic_processes.of_academic_process(academic_process.id).first
 

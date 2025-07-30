@@ -99,6 +99,12 @@ class AcademicProcess < ApplicationRecord
   #   p "max_subjects: #{max_subjects}"
   # end
 
+  def title_to_enroll_process
+    title = "PROCESO DE INSCRIPCIÓN #{process_name} - #{self.school&.name} "
+    title += " CON CITA HORARIA" if enrollment_days&.of_today.first&.active_now?
+    title
+  end
+  
   def name_without_school
     name.split(" | ").last
   end
