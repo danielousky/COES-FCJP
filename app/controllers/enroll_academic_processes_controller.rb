@@ -98,15 +98,8 @@ class EnrollAcademicProcessesController < ApplicationController
           # INTENTO POR TOTAL DE CREDITOS Y ASIGNATURAS: 
           credits_attemp = enroll_academic_process.total_credits_not_retired+course.subject.unit_credits
           subjects_attemp = enroll_academic_process.total_subjects_not_retired+1
-
-          overlapped = false
           
-          section.schedules.each_with_index do |sh,i|
-            overlapped = enroll_academic_process.overlapped?(sh)
-            break if overlapped
-          end
-
-          if overlapped
+          if enroll_academic_process.overlapped?(section.timetable)
             # SOLAPAMIENTO DE HORARIOS
             estado = 'error'
             msg = "¡Solapamiento de horarios! Por favor, seleccione otra sección que no choque con el horario del resto de sus asignaturas ya reservadas."

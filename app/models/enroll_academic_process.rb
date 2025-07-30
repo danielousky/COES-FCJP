@@ -136,13 +136,25 @@ class EnrollAcademicProcess < ApplicationRecord
     user_aux = user
     [user_aux.ci, user_aux.first_name, user_aux.last_name, school.name, academic_process.process_name, enroll_status&.titleize, permanence_status&.titleize, resume_payment_reports]
   end
-  def overlapped? schedule2
-    # self.schedules.where(day: schedule2.day).each do |sh|
-    self.schedules.where.not('academic_records.status': 3).where(day: schedule2.day).each do |sh|
-      if ((sh.starttime&.to_i < schedule2&.endtime&.to_i) and (schedule2&.starttime&.to_i < sh.endtime&.to_i) )
-        return true 
+  def overlapped? timetable
+    # Get timeblocks from the enroll_academic_process that are not retired
+    enroll_timeblocks = self.timeblocks.joins(:timetable => {:section => :academic_records})
+                                   .where.not('academic_records.status': 3)
+    
+    # Get timeblocks from the provided timetable
+    timetable_timeblocks = timetable.timeblocks
+    
+    # Compare each timeblock from the timetable with enroll timeblocks
+    timetable_timeblocks.each do |timetable_block|
+      enroll_timeblocks.where(day: timetable_block.day).each do |enroll_block|
+        # Check if there's overlap in time
+        if ((enroll_block.start_time&.to_i < timetable_block.end_time&.to_i) and 
+            (timetable_block.start_time&.to_i < enroll_block.end_time&.to_i))
+          return true
+        end
       end
     end
+    
     return false
   end
 
