@@ -2,37 +2,39 @@
 - faculty = @grade.school&.faculty
 - # NUEVO SECUENCIA DE INSCRIPCIÓN:
 
+- # Reporte de pago para los periodos con pagos ACTIVOS:
 - school.academic_processes.payments_actives.each do |academic_process|
   - if inscripcion = @grade.enroll_academic_processes.of_academic_process(academic_process.id).first
-    - if inscripcion&.payment_reports.any?
-      = render '/enroll_academic_processes/show_planilla'
-    - else
-      .alert.alert-danger.text-center
-        %h4.bg-danger.text-light.p-2.fa-fade Reporte Pago Pendiente
-        %b ¡Atención!
-        Es necesario realizar el pago de su inscripción para posteriormente reportarlo. A Continuación los datos necesarios
-        - bank_accounts = school.bank_accounts.any? ? school.bank_accounts : faculty.bank_accounts
-        = render partial: '/payment_reports/show_data_bank_account', locals: {bank_accounts: bank_accounts, amount: inscripcion.pay_amount}
+    - if !inscripcion&.reservado?
+      - if inscripcion&.payment_reports.any? and inscripcion&.confirmado?
+        = render '/enroll_academic_processes/show_planilla'
+      - else
+        .alert.alert-danger.text-center
+          %h4.bg-danger.text-light.p-2.fa-fade Reporte Pago Pendiente
+          %b ¡Atención!
+          Debe realizar el pago de su inscripción para posteriormente reportarlo. A Continuación los necesarios 
+          - bank_accounts = school.bank_accounts.any? ? school.bank_accounts : faculty.bank_accounts
+          = render partial: '/payment_reports/show_data_bank_account', locals: {bank_accounts: bank_accounts, amount: inscripcion.pay_amount}
 
-        - id = "paymentReportModal#{inscripcion.id}"
-        - titlePayment = "Reportar Pago inscripción #{academic_process.short_desc}"
-        %br
-        %a.btn.btn-success.btn-lg.my-3{"data-bs-target": "##{id}", "data-bs-toggle": :modal, type: :button}
-          .fa.fa-receipt
-          = titlePayment
-      - reportable = inscripcion
-      - @payment_report_new = PaymentReport.new(payable: inscripcion, amount: academic_process.registration_amount)
-      - content = render partial: "/payment_reports/form"
-      = render partial: '/layouts/scaffold-modal', locals: {content: content, title: titlePayment, id: id}
+          - id = "paymentReportModal#{inscripcion.id}"
+          - titlePayment = "Reportar Pago inscripción #{academic_process.short_desc}"
+          %br
+          %a.btn.btn-success.btn-lg.my-3{"data-bs-target": "##{id}", "data-bs-toggle": :modal, type: :button}
+            .fa.fa-receipt
+            = titlePayment
+        - reportable = inscripcion
+        - @payment_report_new = PaymentReport.new(payable: inscripcion, amount: academic_process.registration_amount)
+        - content = render partial: "/payment_reports/form"
+        = render partial: '/layouts/scaffold-modal', locals: {content: content, title: titlePayment, id: id}
 
-
+- # Reporte de pago para los periodos con inscripciones activas:
 - school.academic_processes.enrolls.each do |academic_process|
   - academic_process_before = academic_process&.process_before
   - # INSCRIPCIÓN ABIERTA!
+  - inscripcion = @grade.enroll_academic_processes.of_academic_process(academic_process.id).first
   .border.border-success.mb-3
     %h5.text-center.bg-success.text-light.py-2.mt-0.animate__animated.animate__fadeIn= academic_process.title_to_enroll_process
     .p-2
-      - inscripcion = @grade.enroll_academic_processes.of_academic_process(academic_process.id).first
 
       - if inscripcion&.confirmado?
         - msg = 'Generar Constancia de Inscripción'
@@ -42,7 +44,9 @@
             .fa-solid.fa-graduation-cap
             = msg
 
-      - if inscripcion&.reservado? or @grade.valid_to_enroll_in academic_process
+      -# Ocultamiento temporal de la validación de inscripción por ser el primer proceso y no tener historicos totales
+      -# if inscripcion&.reservado? or @grade.valid_to_enroll_in academic_process #Antes 
+      - if inscripcion&.reservado? or inscripcion.nil? #@grade.valid_to_enroll_in academic_process
         - # "REGULAR"
         - # ROYER RABIT 
         = render partial: '/grades/regulation'
