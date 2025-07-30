@@ -12,7 +12,7 @@
     - # forzada a false para que, por el momento, no entre en ningún caso por aquí
     - subjects_offer_by_level_approved = @grade.subjects_offer_by_level_approved
     - courses_offer = courses_offer.where(subject_id: subjects_offer_by_level_approved.ids)
-  - elsif true #study_plan.por_dependencia?
+  - elsif study_plan.por_dependencia?
     - # Forzada a true para que siempre entre por aquí
     - subjects_offer_by_dependency = @grade.subjects_offer_by_dependent
     - courses_offer = courses_offer.where(subject_id: subjects_offer_by_dependency.ids)
