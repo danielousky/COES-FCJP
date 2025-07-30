@@ -238,7 +238,7 @@ class Student < ApplicationRecord
     end
 
     list do
-      scopes [:with_user]
+      # scopes [:with_user]
       search_by :custom_search
       checkboxes false
       filters [:schools]
