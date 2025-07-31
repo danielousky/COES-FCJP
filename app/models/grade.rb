@@ -347,7 +347,7 @@ class Grade < ApplicationRecord
   end
 
   def academic_processes_unenrolled
-    school.academic_processes.where(modality: study_plan_modality).joins(period: :period_type).order('periods.year DESC, period_types.code DESC').reject{|ap|self.academic_processes.ids.include?(ap.id)}
+    school.academic_processes.joins(period: :period_type).order('periods.year DESC, period_types.code DESC').reject{|ap|self.academic_processes.ids.include?(ap.id)}
   end
 
   # ENROLLMENT

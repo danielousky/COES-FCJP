@@ -2,8 +2,8 @@
     .col-md-8
         - school = @grade.school
         - #academic_process = school.academic_processes.first #enrolls.each do |academic_process|
-        - academic_processes = school.academic_processes.where(modality: @grade.study_plan_modality).enrolls
-        - academic_processes = school.academic_processes.where(modality: @grade.study_plan_modality).limit(1) unless academic_processes.any?
+        - academic_processes = school.academic_processes.enrolls
+        - academic_processes = school.academic_processes.limit(1) unless academic_processes.any?
         - academic_processes.each do |academic_process|
             .text-center
                 - if enroll_academic_process = @grade.enroll_academic_processes.where(academic_process: academic_process).first 
@@ -13,7 +13,7 @@
                 - else
                     = link_to "/enroll_academic_processes?academic_process_id=#{academic_process.id}&grade_id=#{@grade.id}", class: "btn btn-lg btn-success float-start m-3", method: :post do
                         .fa.fa-calendar-check
-                        = "Preinscribirse en #{academic_process.process_name}"
+                        = "Preinscribir en #{academic_process.process_name}"
     .col-md-4
         - id = 'addInscriptionModal'
         %a.btn.btn-info.float-end.btn-lg.my-3{"data-bs-target": "##{id}", "data-bs-toggle": :modal, type: :button}
