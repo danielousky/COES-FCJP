@@ -8,7 +8,7 @@
     - if !inscripcion&.reservado?
       - if inscripcion&.payment_reports.any? and inscripcion&.confirmado?
         = render '/enroll_academic_processes/show_planilla'
-      - else
+      - elsif !inscripcion&.payment_reports.any?
         .alert.alert-danger.text-center
           %h4.bg-danger.text-light.p-2.fa-fade Reporte Pago Pendiente
           %b ¡Atención!

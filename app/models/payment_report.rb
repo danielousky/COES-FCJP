@@ -83,7 +83,7 @@ class PaymentReport < ApplicationRecord
   # validates :payable_type, presence: true
   validates :payable, presence: true
   validates :amount, presence: true
-  validates :transaction_id, presence: true
+  validates :transaction_id, presence: true, uniqueness: { scope: [:payable_type], message: "ya ha sido utilizado para este proceso académico" }
   validates :transaction_type, presence: true
   validates :transaction_date, presence: true
   validates :origin_bank, presence: true
