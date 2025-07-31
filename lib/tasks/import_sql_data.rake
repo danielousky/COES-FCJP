@@ -119,6 +119,19 @@ namespace :import do
 
                   # register_partial_qualification(academic_record, :primer_lapso, data[3])
                   # register_partial_qualification(academic_record, :segundo_lapso, data[4])
+                # Registrar calificación definitiva que está en data[9]
+                valor_definitivo = data[9]
+                if valor_definitivo.present? && valor_definitivo != 'NULL'
+                  valor_definitivo = valor_definitivo.gsub(/[^0-9A-Za-z]/, '').upcase
+                  if valor_definitivo
+                    calificacion_correcta = academic_record.set_status valor_definitivo
+                    if (calificacion_correcta.eql?(false))
+                      p "Calificación definitiva incorrecta: #{valor_definitivo} - #{academic_record.status}"
+                    end
+                  end
+                else
+                  p "Sin calificación definitiva Registro Académico: #{academic_record.id}"
+                end
 
                 else
                   p "No se pudo guardar AcademicRecord para: #{student.user.ci} - #{subject.name} - #{section_letter.upcase}: #{academic_record.errors.full_messages.to_sentence}"
