@@ -18,6 +18,6 @@
     %input.border-0.me-0.form-control{name: :query, "aria-label" => "Buscar", placeholder: "Buscar Usuario", type: "search", value: @value}
     %button.border-0.ms-0.btn.btn-success.rounded-end{type: "submit"} 
       %i.fa-solid.fa-search
-  .text-white= "| #{@page_name}"
+  .text-info= "| #{@page_name}"
   #secondary-navigation.collapse.navbar-collapse
     = render partial: 'layouts/rails_admin/secondary_navigation'

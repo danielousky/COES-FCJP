@@ -88,6 +88,10 @@ class Student < ApplicationRecord
   scope :find_by_user_ci, -> (ci) {joins(:user).where('users.ci': ci).first}
   scope :with_user, -> { joins(:user) }
 
+  # Scope para obtener los estudiantes que no tienen dirección asociada
+  scope :without_address, -> { left_outer_joins(:address).where(addresses: { id: nil }) }
+
+  
   # CALLBACKS:
   after_destroy :check_user_for_destroy
   
