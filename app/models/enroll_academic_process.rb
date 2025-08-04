@@ -91,13 +91,58 @@ class EnrollAcademicProcess < ApplicationRecord
 
   scope :sort_by_numbers_of_this_process, -> () {order(['enroll_academic_processes.efficiency': :desc, 'enroll_academic_processes.simple_average': :desc, 'enroll_academic_processes.weighted_average': :desc])}
 
-  scope :without_academic_records, -> {joins(:academic_records).group(:"enroll_academic_processes.id").having('COUNT(*) = 0').count}
+  # scope :without_academic_records, -> {joins(:academic_records).group(:"enroll_academic_processes.id").having('COUNT(*) = 0').count}
+  scope :without_academic_records, -> { left_joins(:academic_records).where(academic_records: { id: nil }) }
 
   scope :with_any_academic_records, -> {joins(:academic_records).group(:"enroll_academic_processes.id").having('COUNT(*) > 0').count}
+  scope :con_alguna_inscripcion, -> {where(id: with_i_or_more_academic_records(1).keys.to_a)}
 
   scope :with_i_academic_records, -> (i){joins(:academic_records).group(:"enroll_academic_processes.id").having('COUNT(*) = ?', i).count}
+  scope :with_i_or_more_academic_records, -> (i){joins(:academic_records).group(:"enroll_academic_processes.id").having('COUNT(*) >= ?', i).count}
   
   scope :total_with_i_academic_records, -> (i){(joins(:academic_records).group(:"enroll_academic_processes.id").having('COUNT(*) = ?', i).count).count}
+
+  # Scopes para filtrado por cantidad de registros académicos
+  scope :total_with_0_academic_records, -> { with_0_academic_records.count }
+  scope :with_0_academic_records, -> { left_joins(:academic_records).where(academic_records: { id: nil }) }
+  scope :sin_inscripciones, -> { with_0_academic_records}
+
+  # scope :with_1_academic_record, -> { joins(:academic_records).group(:"enroll_academic_processes.id").having('COUNT(academic_records.id) = 1') }
+  scope :with_1_academic_record, -> { where(id: with_i_academic_records(1).keys.to_a)}
+  scope :con_1_inscripcion, -> { with_1_academic_record}
+  scope :total_with_1_academic_record, -> { with_1_academic_record.count }
+
+  scope :with_2_academic_records, -> { where(id: with_i_academic_records(2).keys.to_a)}
+  scope :con_2_inscripciones, -> { with_2_academic_records}
+  scope :total_with_2_academic_records, -> { with_2_academic_records.count }
+
+  scope :with_3_academic_records, -> { where(id: with_i_academic_records(3).keys.to_a)}
+  scope :con_3_inscripciones, -> { with_3_academic_records}
+  scope :total_with_3_academic_records, -> { with_3_academic_records.count }
+
+  scope :with_4_academic_records, -> { where(id: with_i_academic_records(4).keys.to_a)}
+  scope :con_4_inscripciones, -> { with_4_academic_records}
+  scope :total_with_4_academic_records, -> { with_4_academic_records.count }
+
+  scope :with_5_or_more_academic_records, -> { where(id: with_i_or_more_academic_records(5).keys.to_a)}
+  scope :con_5_o_mas_inscripciones, -> { with_5_or_more_academic_records}
+  scope :total_with_5_or_more_academic_records, -> { with_5_or_more_academic_records.count }
+
+  # Scope para ordenamiento por cantidad de registros académicos
+  scope :order_by_academic_records_count, -> (direction = :asc) { 
+    left_joins(:academic_records)
+      .group(:"enroll_academic_processes.id")
+      .order("COUNT(academic_records.id) #{direction}")
+  }
+
+  # Scopes para ordenamiento específico
+  scope :order_by_academic_records_count_asc, -> { order_by_academic_records_count(:asc) }
+  scope :order_by_academic_records_count_desc, -> { order_by_academic_records_count(:desc) }
+
+  # Scope para ordenamiento eficiente con conteo
+  scope :order_by_academic_records_count_efficient, -> (direction = :asc) {
+    with_academic_records_count.order("academic_records_count #{direction}")
+  }
 
   scope :custom_search, -> (keyword) { joins(:user, :period).where("users.ci ILIKE '%#{keyword}%' OR periods.name ILIKE '%#{keyword}%'") }
 
@@ -281,6 +326,18 @@ class EnrollAcademicProcess < ApplicationRecord
     subjects.count
   end
 
+  def academic_records_count
+    academic_records.count
+  end
+
+  # Método para obtener el conteo de registros académicos de manera eficiente
+  def self.with_academic_records_count
+    left_joins(:academic_records)
+      .group(:"enroll_academic_processes.id")
+      .select("enroll_academic_processes.*, COUNT(academic_records.id) as academic_records_count")
+  end
+
+
   def total_subjects_coursed
     academic_records.total_subjects_coursed
   end
@@ -385,8 +442,8 @@ class EnrollAcademicProcess < ApplicationRecord
     list do
       search_by :custom_search
       # filters [:process_name, :student]
-      scopes [:todos, :preinscrito, :reservado, :confirmado, :retirado, :con_reporte_de_pago, :sin_reporte_de_pago]
-
+      scopes [:todos, :preinscrito, :reservado, :confirmado, :retirado, :con_reporte_de_pago, :sin_reporte_de_pago, :sin_inscripciones]
+      checkboxes false
       
       field :school do
         sticky true 
@@ -428,9 +485,11 @@ class EnrollAcademicProcess < ApplicationRecord
         end
       end
       
-      field :total_subjects do
+      field :academic_records_count do
         label 'Tot Asig'
         column_width 40
+
+
       end
 
       field :total_credits do

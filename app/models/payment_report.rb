@@ -49,7 +49,9 @@ class PaymentReport < ApplicationRecord
   belongs_to :payable, polymorphic: true
   belongs_to :school
   belongs_to :user
+  
   # Atención: Esta es la mejor opción pero es posible que no funcione por el polimorfismo
+  # Atención2: Rails no permite asociaciones has_one polimorficas ya que no tiene manera de encontrar la relación intermedia
   # has_one :student, through: :payable
   # has_one :user, through: :student
   belongs_to :receiving_bank_account, class_name: 'BankAccount'
@@ -83,7 +85,28 @@ class PaymentReport < ApplicationRecord
   # validates :payable_type, presence: true
   validates :payable, presence: true
   validates :amount, presence: true
-  validates :transaction_id, presence: true, uniqueness: { scope: [:payable_type], message: "ya ha sido utilizado para este proceso académico" }
+  validates :transaction_id, presence: true, uniqueness: true
+
+  # Atención: La función transaction_id_unico_en_payment_process funciona al peluche pero, pensandolo mejor,
+  # no debería ser aplicacda ya que el transaction_id es único para cualquier pago y no para un proceso académico en particular.
+  # En todo caso, esta función ya ha sido probada y funciona correctamente.
+  # validate :transaction_id_unico_en_payment_process
+
+  # def transaction_id_unico_en_payment_process
+  #   return if transaction_id.blank? || payment_process.blank?
+
+  #   # Busca si existe otro PaymentReport con el mismo transaction_id y payment_process
+  #   # Usamos una consulta que evita joins con asociaciones polimórficas
+  #   existente = PaymentReport.where(transaction_id: transaction_id)
+  #                           .where.not(id: id)
+  #                           .select do |pr| 
+  #                             pr.payment_process&.id == self.payment_process&.id
+  #                           end
+
+  #   if existente.any?
+  #     errors.add(:transaction_id, "ya ha sido utilizado para este proceso académico")
+  #   end
+  # end
   validates :transaction_type, presence: true
   validates :transaction_date, presence: true
   validates :origin_bank, presence: true
