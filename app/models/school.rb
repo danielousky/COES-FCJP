@@ -13,6 +13,8 @@
 #  have_partial_qualification   :boolean          default(FALSE), not null
 #  name                         :string           not null
 #  short_name                   :string
+#  signatore_name               :string
+#  signatore_position           :string
 #  type_entity                  :integer          default("pregrado"), not null
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
@@ -80,10 +82,21 @@ class School < ApplicationRecord
   # ENUMERATIONS:
   enum type_entity: {pregrado: 0, postgrado: 1, extension: 2, investigacion: 3}
 
+  has_one_attached :sello_escuela
+  attr_accessor :remove_sello_escuela
+  after_save { sello_escuela.purge if remove_sello_escuela.eql? '1' } 
+
+
+  has_one_attached :firma_oficial_escuela
+  attr_accessor :remove_firma_oficial_escuela
+  after_save { firma_oficial_escuela.purge if remove_firma_oficial_escuela.eql? '1' } 
+
   # VALIDATIONS
   validates :type_entity, presence: true
   validates :code, presence: true, uniqueness: {case_sensitive: false}
   validates :name, presence: true, uniqueness: {case_sensitive: false}
+  # validates :sello_escuela, presence: true#, if: :sello_escuela_required?
+  # validates :firma_oficial_escuela, presence: true#, if: :firma_oficial_escuela_required?
 
   # CALLBAKCS:
   # after_initialize :set_unique_faculty
@@ -487,6 +500,27 @@ class School < ApplicationRecord
     end
 
     edit do
+      field :sello_escuela do
+        label 'Sello de la Escuela'
+      end
+      field :firma_oficial_escuela do
+        label 'Firma Oficial de la Escuela'
+      end
+
+      field :signatore_name do
+        label 'Nombre del Firmante'
+        html_attributes do
+          {:onInput => "$(this).val($(this).val().toUpperCase())"}
+        end
+      end
+      field :signatore_position do
+        label 'Cargo del Firmante'
+        html_attributes do
+          {:onInput => "$(this).val($(this).val().toUpperCase())"}
+        end
+      end
+
+
       field :faculty do
         read_only true
         pretty_value do
@@ -532,6 +566,7 @@ class School < ApplicationRecord
           {:onInput => "$(this).val($(this).val().toUpperCase())"}
         end
       end
+      
 			field :bank_accounts do
 				inline_edit false
 				inline_add false

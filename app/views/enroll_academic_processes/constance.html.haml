@@ -44,39 +44,46 @@
 
 %h3.text-center= "--Válida para el período actual--"
 
-- if @school&.pregrado?
-  - enlace = "https://coesfcjp.com/validar/#{@version.id}/constancias?object_id=#{@enroll_academic_process.id}"
-  - enlace +="&study=true" if @study_contance.eql? true
 
-  - imagen_qr = CodigoQr.generate_image enlace
-  - #pdf.image imagen_qr, width: 120, at: [10, (pdf.y)+40]
+- enlace = "https://coesfcjp.com/validar/#{@version.id}/constancias?object_id=#{@enroll_academic_process.id}"
+- enlace +="&study=true" if @study_contance.eql? true
 
-  .text-center
-    = image_tag imagen_qr
-    =# image_tag main_app.url_for(imagen_qr), size: size, alt: alt
+- imagen_qr = CodigoQr.generate_image enlace
+- #pdf.image imagen_qr, width: 120, at: [10, (pdf.y)+40]
+
+.text-center
+  = image_tag imagen_qr
+  =# image_tag main_app.url_for(imagen_qr), size: size, alt: alt
 
 
-  .alert-message.text-justify
-    %p= "<b>ATENCIÓN:</b> Para verificar la autenticidad del presente documento escanee el código QR, haga clic en la siguiente dirección o escríbala en su navegador web:".html_safe
-    %p= enlace
+.alert-message.text-justify
+  %p= "<b>ATENCIÓN:</b> Para verificar la autenticidad del presente documento escanee el código QR, haga clic en la siguiente dirección o escríbala en su navegador web:".html_safe
+  %p= enlace
 
-  %br
-  %br
-  #firma_jefe
-    %br
-    %br
-    %br
-    %br
-    .text-center= @faculty.coes_boss_name
-    .text-center= "Jefe(a) de Control de Estudio"
-  #sello_coes
+%br
+%br
 
+- if @school.firma_oficial_escuela.attached?
+  = image_tag @school.firma_oficial_escuela, style: 'position: absolute; left: 390px; top: 720px; width: 150px;'
 - else
-  %br
-  %br
-  %br
-  %br
-  %br
-  %br
-  .text-center Prof. Pedro Barrios Mota
-  .text-center Decano
+  = "__________________________________________________________"
+
+%br
+%br
+%br
+%br
+.text-center
+  - if @school.signatore_name.present?
+    = @school.signatore_name
+  - else
+    = @faculty.coes_boss_name
+
+.text-center
+  - if @school.signatore_position.present?
+    = @school.signatore_position
+  - else
+    = "Jefe(a) de Control de Estudio"
+- if @school.sello_escuela.attached?
+  = image_tag @school.sello_escuela, style: 'position: absolute; left: 410px; top: 820px; width: 100px;'
+- else
+  = "Sello de la Escuela"

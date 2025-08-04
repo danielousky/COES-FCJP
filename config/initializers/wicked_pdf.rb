@@ -37,8 +37,5 @@ WickedPdf.config.merge!({
   orientation: "Portrait", # Landscape
   page_size: "letter",
   background: true,
-  pdi: 75,
-  image_quality: 800,
-  image_dpi: 800,
   delete_temporary_files: true 
 })

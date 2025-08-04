@@ -6,7 +6,7 @@
 - school.academic_processes.payments_actives.each do |academic_process|
   - if inscripcion = @grade.enroll_academic_processes.of_academic_process(academic_process.id).first
     - if !inscripcion&.reservado?
-      - if inscripcion&.payment_reports.any? and inscripcion&.confirmado?
+      - if inscripcion&.payment_reports.any? and !inscripcion&.confirmado?
         = render '/enroll_academic_processes/show_planilla'
       - elsif !inscripcion&.payment_reports.any?
         .alert.alert-danger.text-center
@@ -36,7 +36,7 @@
     %h5.text-center.bg-success.text-light.py-2.mt-0.animate__animated.animate__fadeIn= academic_process.title_to_enroll_process
     .p-2
 
-      - if false #inscripcion&.confirmado?
+      - if inscripcion&.confirmado?
         - msg = 'Generar Constancia de Inscripción'
         .text-center
           = link_to "/enroll_academic_processes/#{inscripcion.id}.pdf", class: 'btn btn-primary text-center btn-lg align-middle', target: '_blank', rel: "noopener noreferrer", 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: :tooltip do
