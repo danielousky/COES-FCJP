@@ -1,4 +1,4 @@
-- admin_can_manage = (session[:rol]&.eql? 'admin' and current_user&.admin&.authorized_manage? 'Seccion')
+- admin_can_manage = (session[:rol]&.eql? 'admin' and current_user&.admin&.authorized_manage? 'Section')
 - is_his_teacher = section.current_user_is_a_teacher_of_this? current_user&.id
 - if section.academic_records.any?
   - if ((is_his_teacher and section.academic_process.active? and section.qualified?) or admin_can_manage)
