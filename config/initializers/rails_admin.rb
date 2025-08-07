@@ -130,7 +130,7 @@ RailsAdmin.config do |config|
     end
 
     bulk_delete do
-      only [AcademicRecord, Section]
+      only [EnrollAcademicProcess, AcademicRecord, Section]
     end
 
     show do

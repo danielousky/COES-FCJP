@@ -215,8 +215,14 @@ class AcademicProcess < ApplicationRecord
   end
 
   def link_to_massive_confirmation
-    "<a href='/academic_processes/#{id}/massive_confirmation' data-bs-toggle='tooltip' title='Confirmar preinscritos y reservados con reporte de pago' data-confirm='Está acción confirmará #{self.enroll_academic_processes.not_confirmado.total_with_payment_report} estudiantes (preinscritos o reservados) con reporte de pago. ¿Está completamente seguro?' class='label bg-info'><i class= 'fa-regular fa-list-check'></i></a>".html_safe
+    "<a href='/academic_processes/#{id}/massive_confirmation' data-bs-toggle='tooltip' title='Confirmar preinscritos y reservados con reporte de pago' data-confirm='Está acción confirmará #{self.enroll_academic_processes.not_confirmado.total_with_payment_report} estudiantes (preinscritos o reservados) con reporte de pago. ¿Está completamente seguro?' class='label bg-info text-dark'><i class= 'fa-regular fa-list-check'></i></a>".html_safe
   end
+
+  def link_to_massive_delete_unreported
+    total = self.enroll_academic_processes.not_confirmado.total_without_payment_report
+    msg = (total > 50 ) ? "50 de #{total}" : total
+    "<a href='/academic_processes/#{id}/massive_delete_unreported' data-bs-toggle='tooltip' title='Elminar #{msg} preinscrito(s) y reservado(s) sin reporte de pago' data-confirm='Está acción eliminará la inscripción de #{total} estudiante(s) (preinscritos o reservados) sin reporte de pago. ¿Está completamente seguro?' class='label label-danger'><i class= 'fa-regular fa-trash'></i><i class= 'fa-regular fa-list'></i></a>".html_safe
+  end  
 
   def link_to_massive_actas_generation
     # simple_toggle href, value, title_tooltip, color_type, icon, onclick_action = nil

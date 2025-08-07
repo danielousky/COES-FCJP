@@ -1,5 +1,6 @@
 - if authorized
     = "#{ap.btn_total_enrolls_by_status}".html_safe
+    = ap.link_to_massive_delete_unreported if ap.enroll_academic_processes.not_confirmado.sin_reporte_de_pago.any?
     = ap.link_to_massive_confirmation if ap.enroll_academic_processes.not_confirmado.with_payment_report.any?
 - else
     = "#{ap.label_total_enrolls_by_status}".html_safe

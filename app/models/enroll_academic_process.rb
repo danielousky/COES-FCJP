@@ -443,8 +443,7 @@ class EnrollAcademicProcess < ApplicationRecord
       search_by :custom_search
       # filters [:process_name, :student]
       scopes [:todos, :preinscrito, :reservado, :confirmado, :retirado, :con_reporte_de_pago, :sin_reporte_de_pago, :sin_inscripciones]
-      checkboxes false
-      
+            
       field :school do
         sticky true 
         searchable :name

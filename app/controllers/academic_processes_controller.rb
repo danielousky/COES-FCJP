@@ -1,5 +1,5 @@
 class AcademicProcessesController < ApplicationController
-  before_action :set_academic_process, only: %i[ show edit update destroy clone_sections clean_courses run_regulation massive_confirmation massive_actas_generation]
+  before_action :set_academic_process, only: %i[ show edit update destroy clone_sections clean_courses run_regulation massive_confirmation massive_actas_generation massive_delete_unreported]
 
   def massive_confirmation
     total = @academic_process.enroll_academic_processes.not_confirmado.with_payment_report
@@ -8,6 +8,25 @@ class AcademicProcessesController < ApplicationController
       total.each {|ins| ins.confirm_with_email}
       flash[:success] = "Se actualizaron #{total_count} inscripciones"
     rescue Exception => e
+      flash[:danger] = "No fue posible completar la operación: #{e}"
+    end
+    redirect_back fallback_location: '/admin/enroll_academic_process'
+  end
+
+  def massive_delete_unreported
+    total = @academic_process.enroll_academic_processes.not_confirmado.sin_reporte_de_pago.limit(50)
+    total_count = total.count
+
+    if total.destroy_all
+      # Registrar la actividad en PaperTrail para el usuario actual
+      if current_user
+        PaperTrail.request(whodunnit: current_user.id) do
+          @academic_process.paper_trail_event = "Eliminación masiva de inscripciones sin reporte de pago por el usuario #{current_user.email}"
+          @academic_process.save(validate: false)
+        end
+      end
+      flash[:info] = "Fueron eliminadas #{total_count} inscripciones"
+    else
       flash[:danger] = "No fue posible completar la operación: #{e}"
     end
     redirect_back fallback_location: '/admin/enroll_academic_process'
