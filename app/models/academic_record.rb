@@ -197,7 +197,8 @@ class AcademicRecord < ApplicationRecord
   def values_for_report
     user_aux = user
     # [user_aux.ci, user_aux.first_name, user_aux.last_name, school.name, grade&.level_offer, area.name, subject.code, subject.name, academic_process.process_name, section.code, self.get_value_by_status]
-    [user_aux.ci, user_aux.first_name, user_aux.last_name, school.name, area.name, subject.code, subject.name, subject.unit_credits, self.final_q_to_02i, self.q_value_to_02i, self.tipo_examen, period_type.code, period.year, section.code, study_plan&.code]
+    # [user_aux.ci, user_aux.first_name, user_aux.last_name, school.name, area.name, subject.code, subject.name, subject.unit_credits, self.final_q_to_02i, self.q_value_to_02i, self.tipo_examen, period_type.code, period.year, section.code, study_plan&.code]
+    [user_aux.ci, user_aux.first_name, user_aux.last_name, school.name, area.name, subject.code, subject.name, subject.unit_credits, self.final_q_to_02i, self.get_value_by_status, self.tipo_examen, period_type.code, period.year, section.code, study_plan&.code]
   end
   
   def is_totality_partial?

@@ -21,7 +21,9 @@ class ExportCsvController < ActionController::Base
       model_titulo = "#{I18n.t("activerecord.models.#{model}.one")&.titleize}"
       aux = "Reporte Coes - Registros - #{model_titulo} #{DateTime.now.strftime('%d-%m-%Y_%I:%M%P')}.csv"
       response.headers.delete('Content-Length')
-      response.headers['Cache-Control'] = 'no-cache'
+      response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+      response.headers['Pragma'] = 'no-cache'
+      response.headers['Expires'] = '0'
       response.headers['Content-Type'] = "text/event-stream;charset='utf-8';header=present"
       response.headers['X-Accel-Buffering'] = 'no'
       response.headers['ETag'] = '0'
@@ -69,7 +71,9 @@ class ExportCsvController < ActionController::Base
       model_titulo = "#{I18n.t("activerecord.models.#{model}.one")&.titleize}"
       aux = "Reporte Coes - Inscritos - #{model_titulo} #{cod} #{DateTime.now.strftime('%d-%m-%Y_%I:%M%P')}.csv"
       response.headers.delete('Content-Length')
-      response.headers['Cache-Control'] = 'no-cache'
+      response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+      response.headers['Pragma'] = 'no-cache'
+      response.headers['Expires'] = '0'
       response.headers['Content-Type'] = "text/event-stream;charset='utf-8';header=present"
       response.headers['X-Accel-Buffering'] = 'no'
       response.headers['ETag'] = '0'
