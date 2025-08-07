@@ -478,7 +478,7 @@ class AcademicRecord < ApplicationRecord
     if pi?
       'PI'
     else
-      q_value_to_02i_to_from final_q
+      qualifications.final.first&.value_entero
     end
   end
 

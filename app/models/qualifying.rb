@@ -8,11 +8,15 @@ module Qualifying
         "<span class='text-center badge #{aux}' data-bs-toggle='tooltip' rel='tooltip' data-bs-original-title='#{evaluation&.titleize} #{%{👍🏽} if approved?}'>#{value_to_02i}</span>"
     end
     def value_to_02i
-    is_valid_numeric_value? ?  sprintf("%02.2f", value) : nil
+      is_valid_numeric_value? ?  sprintf("%02.2f", value) : nil
+    end
+
+    def value_entero
+      value.to_i if is_valid_numeric_value?
     end
 
     def is_valid_numeric_value?
-    !value.blank? and (value.is_a? Integer or value.is_a? Float or value.is_a? BigDecimal)
+      !value.blank? and (value.is_a? Integer or value.is_a? Float or value.is_a? BigDecimal)
     end
 
   def approved?
