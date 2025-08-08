@@ -74,10 +74,17 @@ class PaymentReport < ApplicationRecord
   after_save { voucher.purge if remove_voucher.eql? '1' }   
 
   before_validation :set_payable_values
+  before_validation :set_origin_bank_for_taquilla, if: :taquilla?
 
   def set_payable_values
     self.school_id = self.school_by_payable.id
     self.user_id = self.user_by_payable.id
+  end
+
+  def set_origin_bank_for_taquilla
+    return if origin_bank_id.present?
+    taquilla_bank = Bank.find_by(code: '0000')
+    self.origin_bank = taquilla_bank if taquilla_bank.present?
   end
 
   # VALIDATIONS:
@@ -110,11 +117,11 @@ class PaymentReport < ApplicationRecord
   validates :transaction_type, presence: true
   validates :transaction_date, presence: true
   validates :origin_bank, presence: true
-  validates :receiving_bank_account, presence: true
+  validates :receiving_bank_account, presence: true, unless: :taquilla?
   validates :voucher, presence: true
 
   # Enum:
-  enum transaction_type: {transferencia: 0, deposito: 1}
+  enum transaction_type: {transferencia: 0, deposito: 1, taquilla: 3}
   enum status: [:Pendiente, :Validado, :Invalidado]
 
   # SPECIALS FUNCTIONS OF POLYMORPHIC:

@@ -8,24 +8,31 @@
   =# f.input :amount, disabled: true, input_html: { class: 'disabled' }, as: :currency
   =# f.input :amount, as: :hidden
   = f.input :amount, as: :currency
+  = f.input :transaction_type, collection: PaymentReport.transaction_types.keys.map{|a| [a.titleize, a]}, as: :radio_buttons, required: true
   = f.input :transaction_id, input_html: {aria: {required: true}, oninput: "onlyNumbers($(this))"}, required: true
+  #message.alert.alert-warning{style: 'display:none'}
+    Coloque en este campo el identificador del ticket proporcionado por Administración
   =# f.input :transaction_type, collection: PaymentReport.transaction_types.map{|e| e}#,  as: :radio
   =# f.collection_radio_buttons :transaction_type, PaymentReport.transaction_types.keys, nil, nil
-  = f.input :transaction_type, collection: PaymentReport.transaction_types.keys.map{|a| [a.titleize, a]}, as: :radio_buttons, required: true
 
   = f.input :transaction_date, as: :date, start_year: Date.today.year,
                             end_year: Date.today.year,
                             order: [:day, :month, :year]
-  = f.association :origin_bank, required: true
+  - taquilla_bank = Bank.find_by(code: '0000')
+  #origin_bank_wrapper
+    = f.association :origin_bank, required: true
+  = f.hidden_field :origin_bank_id, value: taquilla_bank&.id, id: 'payment_report_origin_bank_id_hidden', disabled: true
   =# f.association :payable
 
-  - bank_accounts = @payment_report_new.school_by_payable&.bank_accounts
-  - bank_accounts = @payment_report_new.school_by_payable&.faculty&.bank_accounts unless bank_accounts.any?
-  = f.association :receiving_bank_account, collection: bank_accounts, include_blank: false
+  #receiving_bank_account_wrapper
+    - bank_accounts = @payment_report_new.school_by_payable&.bank_accounts
+    - bank_accounts = @payment_report_new.school_by_payable&.faculty&.bank_accounts unless bank_accounts.any?
+    = f.association :receiving_bank_account, collection: bank_accounts, include_blank: false
 
   = f.input :voucher, required: true, input_html: {accept: "image/jpeg,image/jpg,image/png"}
-  = f.input :owner_account_name, required: true, input_html: {onInput: "$(this).val($(this).val().toUpperCase().replace(/[^A-Z| ]/g,''))"}
-  = f.input :owner_account_ci, required: true, input_html: {onInput: "$(this).val($(this).val().replace(/[^0-9]/g,''))"}
+  #owner_wrapper
+    = f.input :owner_account_name, required: true, input_html: {onInput: "$(this).val($(this).val().toUpperCase().replace(/[^A-Z| ]/g,''))"}
+    = f.input :owner_account_ci, required: true, input_html: {onInput: "$(this).val($(this).val().replace(/[^0-9]/g,''))"}
 
   .form-actions
     = f.button :submit
@@ -33,5 +40,67 @@
 :javascript
 
   function onlyNumbers(e){
-    e.val(e.val().replace(/[^0-9]/g, ''));
+    e.val(e.val().replace(/[^0-9|A-Z|a-z]/g, '').toUpperCase());
   }
+
+  (function(){
+    function setupTaquillaToggle(){
+      
+      var radios = document.querySelectorAll('input[name="payment_report[transaction_type]"]');
+      if(!radios || radios.length === 0) return;
+
+      var originWrapper = document.getElementById('origin_bank_wrapper');
+      var originSelect = document.getElementById('payment_report_origin_bank_id');
+      var hiddenOrigin = document.getElementById('payment_report_origin_bank_id_hidden');
+
+      var receivingBankAccountWrapper = document.getElementById('receiving_bank_account_wrapper');
+      var ownerWrapper = document.getElementById('owner_wrapper');
+
+      var onwerAccountName = document.getElementById('payment_report_owner_account_name');
+      var onwerAccountCI = document.getElementById('payment_report_owner_account_ci');
+
+      var msgAlert = document.getElementById('message')
+
+      var taquillaIdPresent = hiddenOrigin && hiddenOrigin.value && hiddenOrigin.value.length > 0;
+
+      function applyState(value){
+
+        var isTaquilla = (value == 'taquilla') && taquillaIdPresent;
+        if(isTaquilla){
+          if(receivingBankAccountWrapper) receivingBankAccountWrapper.style.display = 'none';
+          if(ownerWrapper) ownerWrapper.style.display = 'none';
+          if(originWrapper) originWrapper.style.display = 'none';
+          if(originSelect) originSelect.disabled = true;
+          if(hiddenOrigin) hiddenOrigin.disabled = false;
+          if(msgAlert) {
+            msgAlert.style.display = ''
+          }
+          if (onwerAccountName) onwerAccountName.required = false;
+          if (onwerAccountCI) onwerAccountCI.required = false;
+          
+        } else {
+          msgAlert.style.display = 'none'
+          if(receivingBankAccountWrapper) receivingBankAccountWrapper.style.display = '';
+          if(ownerWrapper) ownerWrapper.style.display = '';
+          if(originWrapper) originWrapper.style.display = '';
+          if(originSelect) originSelect.disabled = false;
+          if(hiddenOrigin) hiddenOrigin.disabled = true;
+          if (onwerAccountName) onwerAccountName.required = true;
+          if (onwerAccountCI) onwerAccountCI.required = true;
+        }
+      }
+
+      radios.forEach(function(radio){
+        radio.addEventListener('change', function(){ applyState(this.value); });
+        if(radio.checked){ applyState(radio.value); }
+      });
+    }
+
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', setupTaquillaToggle);
+    } else {
+      setupTaquillaToggle();
+    }
+
+    document.addEventListener('turbo:load', setupTaquillaToggle);
+  })();
