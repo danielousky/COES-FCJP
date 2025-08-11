@@ -7,7 +7,7 @@
   = link_to "/admin/academic_record/#{academic_record.id}/edit", class: 'btn btn-primary btn-sm float-end align-middle mx-2', 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: 'Editar Registro', rel: "tooltip" do
     .fa-solid.fa-pencil
 - if (admin&.authorized_delete? 'AcademicRecord') and enabled_delete
-  - msg = 'Eliminar Asignatura'
+  - msg = 'Eliminar Registro'
   - confirm = "Está acción eliminará el registro de inscripción de #{user_student.reverse_name} en la sección #{section.code} de #{section.subject_desc} del periodo #{section.academic_process&.process_name} ¿Está completamente seguro?"
   - confirm_retire = "Está acción retirará a #{user_student.reverse_name} de la sección #{section.code} de #{section.subject_desc} del periodo #{section.academic_process&.process_name} ¿Está seguro?"
 
@@ -17,7 +17,7 @@
 - if !academic_record.pi? and (admin and admin.authorized_update? 'AcademicRecord')
   - if enabled_change
     - if academic_record.retirado?
-      - msg = 'Reinscribir Asignatura'
+      - msg = 'Reinscribir'
       = form_tag "/academic_records/#{academic_record.id}", method: :put, class: 'float-end align-middle' do
         = hidden_field_tag '[academic_record]status', :sin_calificar
         = button_tag(class: 'btn btn-success btn-sm', 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: "tooltip", type: :submit) do
@@ -34,7 +34,7 @@
         %button.btn.btn-sm.btn-warning{"data-bs-target": "#ChangeSec#{section.id}", "data-bs-toggle": :modal, type: :button, class: 'float-end mx-2', title: msg}
           %i.fa-solid.fa-right-left
   - if enabled_retire and !academic_record.retirado?
-    - msg = 'Retirar Asignatura'
+    - msg = 'Retirar'
     = form_tag "/academic_records/#{academic_record.id}", method: :put, class: 'float-end align-middle' do
       = hidden_field_tag '[academic_record]status', :retirado
       = button_tag(class: 'btn btn-danger btn-sm', 'data-bs-toggle': :tooltip, 'data-bs-placement': :top, title: msg, rel: "tooltip", type: :submit, 'data-confirm': confirm_retire) do
