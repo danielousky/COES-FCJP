@@ -11,34 +11,17 @@
     =# stylesheet_link_tag "style", "data-turbo-track": "reload", id: 'style-switch'
     = stylesheet_link_tag "style-dark", "data-turbo-track": "reload", id: 'style-switch'
     = javascript_include_tag "application", "data-turbo-track": "reload", defer: true
-    = favicon_link_tag 'ico_logo.png'
+    =# favicon_link_tag 'ico_logo.png'
 
   %body
     %main
       %section.p-0.d-flex.align-items-center.position-relative.overflow-hidden
-        .container-fluid
-          .row
-            / left
-            .col-12.col-lg-6.d-md-flex.align-items-center.justify-content-center.bg-primary.bg-opacity-10.vh-lg-100
-              .p-3.p-lg-5
-                / Title
-                = render partial: 'layouts/main_banner', locals: {width: '96%', bg_color: ' '}
+        .container-fluid.pt-3
+          = render partial: 'layouts/main_banner', locals: {bg_color: ' '}
+          %br
+          %h3.text-center.bg-info.p-2= @title
+          = render "shared/flashes"
+          = yield
 
-                / Carousel
-                - if @billboards = Billboard.activas
-                  = render partial: 'layouts/carousel', locals: {billboards: @billboards}
-
-            / Right
-            .col-12.col-lg-6.m-auto
-              .row.my-5
-                .col-sm-10.col-xl-8.m-auto
-                  = render "shared/flashes"
-
-                  = yield
-
-              / Row END
-          / Row END
-      / **************** MAIN CONTENT END ****************
-      / Back to top
       .back-top
       %i.bi.bi-arrow-up-short.position-absolute.top-50.start-50.translate-middle

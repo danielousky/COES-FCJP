@@ -1,6 +1,10 @@
-%h1.text-center.bg-success.text-light Validador de Documentos
+.d-flex.justify-content-center.align-items-center.flex-column{style: "min-height: 60vh;"}
+    - if @valido
+        .border.border-warning.p-4.m-3.text-justify= "Mediante la presente validamos que para #{@item.user.la_el} estudiante <b>#{@item.user.reverse_name}</b>, ci: <b>#{@item.user.ci}</b>, <b>'#{@version.event}'</b> del período <b>#{@item.academic_process&.name}</b> el día <b>#{I18n.l(@version.created_at, format: '%d de %B de %Y')}</b>.".html_safe
 
-.border.border-warning.p-3.text-justify= "Mediante la presente página validamos que para #{@item.user.la_el} estudiante <b>#{@item.user.reverse_name}</b>, ci: <b>#{@item.user.ci}</b>, #{@version.event} del período <b>#{@item.academic_process&.name}</b> el día #{I18n.l(@version.created_at, format: '%d de %B de %Y')}.".html_safe
+        .alert.alert-warning.mt-3
+            Si hubiera una discrepancia entre el documento generado y la información de esta vista. Por favor, contacte al personal administrativo de COES para validar la información directamente.
 
-.alert.alert-danger.mt-3
-    Si hubiera una discrepancia entre el documento generado y la información de esta vista. Por favor, contacte al personal administrativo de COES para validar la información
+
+    .mt-4.text-center
+        = link_to 'Volver al inicio', root_path, class: 'btn btn-primary'
