@@ -1,6 +1,6 @@
 - admin_can_manage = (session[:rol]&.eql? 'admin' and current_user&.admin&.authorized_manage? 'Section')
 - is_his_teacher = section.current_user_is_a_teacher_of_this? current_user&.id
-- if section.academic_records.any?
+- if section.academic_records.confirmed.any?
   - if ((is_his_teacher and section.academic_process.active? and section.qualified?) or admin_can_manage)
     = link_to "/sections/#{section.id}.pdf", class: 'btn btn-success btn-sm float-right m-3', target: '_blank', rel: "noopener noreferrer" do
       .fa.fa-download.fa-list

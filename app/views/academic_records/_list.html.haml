@@ -4,29 +4,37 @@
   .alert.alert-warning
     Para activar las calificaciones, cierre todo proceso de inscripción de la escuela respectiva en el listado de períodos y seguidamente active el periodo correspondiente a esta sección  
 
-.table-responsive
-  %table.table.table-condensed.table-striped.table-hover
-    %thead
-      %tr
-        %th #
-        %th CI
-        %th Correo
-        %th Apellidos
-        %th Nombres
-        %th Cal. Final
-        %th Estado
+- if @academic_records.any?
+  .table-responsive
+    %table.table.table-condensed.table-striped.table-hover
+      %thead
+        %tr
+          %th #
+          - if admin and current_user&.admin&.authorized_manage? 'AcademicProcesss'
+            %th Est. Inscrip
+          %th CI
+          %th Correo
+          %th Apellidos
+          %th Nombres
+          %th Cal. Final
+          %th Estado
 
-    %tbody
-      - @academic_records.joins(:user).order('users.last_name ASC, users.first_name ASC').each_with_index do |academic_record, i|
-        - user = academic_record.user
-        %tr{class: academic_record.tr_class_by_status_q}
-          %td= i+1
-          %td
-            - enabled = current_user&.admin&.authorized_read? 'AcademicRecord'
-            = link_to_if enabled, user.ci, "/admin/student/#{academic_record.student.id}"
-          %td= user.email
-          %td= user.last_name
-          %td= user.first_name
-          %td= academic_record.definitive_label
-          %td
-            .badge.bg-info.text-dark= academic_record.status.titleize
+      %tbody
+        - @academic_records.joins(:user).order('users.last_name ASC, users.first_name ASC').each_with_index do |academic_record, i|
+          - user = academic_record.user
+          %tr{class: academic_record.tr_class_by_status_q}
+            %td= i+1
+            - if admin and current_user&.admin&.authorized_manage? 'AcademicProcesss'
+              %td= academic_record.enroll_academic_process_enroll_status_label
+            %td
+              - enabled = current_user&.admin&.authorized_read? 'AcademicRecord'
+              = link_to_if enabled, user.ci, "/admin/student/#{academic_record.student.id}"
+            %td= user.email
+            %td= user.last_name
+            %td= user.first_name
+            %td= academic_record.definitive_label
+            %td
+              .badge.bg-info.text-dark= academic_record.status.titleize
+
+- else
+  .text-center.alert.alert-danger Sin estudiantes confirmados para esta sección

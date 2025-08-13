@@ -190,7 +190,7 @@ class Section < ApplicationRecord
     @sheet = @book.create_worksheet :name => "Seccion #{self.name}"
 
 
-    enrolls = self.academic_records.not_retirado.sort_by_user_name
+    enrolls = self.academic_records.confirmed.sort_by_user_name
 
 
     @sheet.column(0).width = 15 #estudiantes.collect{|e| e.cal_usuario_ci.length if e.cal_usuario_ci}.max+2;

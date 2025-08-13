@@ -33,4 +33,4 @@
 				%br
 				%br
 		- else
-			= render partial: 'academic_records/list', locals: {academic_records: @section.academic_records, admin: false}
+			= render partial: 'academic_records/list', locals: {academic_records: @section.academic_records.confirmed, admin: false}
