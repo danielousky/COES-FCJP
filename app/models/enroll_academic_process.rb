@@ -159,6 +159,19 @@ class EnrollAcademicProcess < ApplicationRecord
   scope :student_merito, -> (academic_process_ids) {includes(:user, :grade, :academic_process).where('acamidec_process.ids': academic_process_ids)}
   
   scope :qualfied_complety, -> {joins(:academic_records).where('academic_records.status != 0')}
+  
+  # Scope que devuelve los procesos de inscripción académica que tienen registros académicos
+  # y que todos esos registros están en estado 'retirado' (status = 3)
+  scope :retiro_total, -> {where(id: full_retired.ids)}
+  
+  scope :full_retired, -> {
+    joins(:academic_records)
+      .group('enroll_academic_processes.id')
+      .having('COUNT(academic_records.id) > 0')
+      .having('COUNT(academic_records.id) = COUNT(CASE WHEN academic_records.status = 3 THEN 1 END)')
+  }
+
+
   def total_retire?
     academic_records.any? and (academic_records.count.eql? academic_records.retirado.count)
   end
@@ -441,8 +454,7 @@ class EnrollAcademicProcess < ApplicationRecord
 
     list do
       search_by :custom_search
-      # filters [:process_name, :student]
-      scopes [:todos, :preinscrito, :reservado, :confirmado, :retirado, :con_reporte_de_pago, :sin_reporte_de_pago, :sin_inscripciones]
+      scopes [:todos, :preinscrito, :reservado, :confirmado, :retiro_total, :con_reporte_de_pago, :sin_reporte_de_pago, :sin_inscripciones]
             
       field :school do
         sticky true 
