@@ -31,5 +31,5 @@
 
     %td.text-center= check_box_tag nil, :reparacion, reparacion, {id: "[#{academic_record.id}][qualification]reparacion", disabled: (checkbox_disabled or diferido), class: 'checkPost post', id_obj: id, onclick: 'checkPost(this);'}
 
-    %td.text-center= text_field_tag "[qualification]post", {}, {id: "[#{academic_record.id}][qualification]post", value: academic_record.post_q_value, placeholder: 'Post', class: 'form-control form-control-sm qualifiable post value_post', disabled: no_post_q, required: !no_post_q,  step: 1, in: 0...21, id_obj: id, type_q: academic_record.post_type_q, onchange: 'sendQualification(this);', oninput: 'onlyValidQ(this);'}
+    %td.text-center= text_field_tag "qualification", "post", {id: "[#{academic_record.id}][qualification]post", value: academic_record.post_q_value, placeholder: 'Post', class: 'form-control form-control-sm qualifiable post value_post', disabled: no_post_q, required: !no_post_q,  step: 1, in: 0...21, id_obj: id, type_q: academic_record.post_type_q, onchange: 'sendQualification(this);', oninput: 'onlyValidQ(this);'}
 
