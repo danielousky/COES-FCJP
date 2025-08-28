@@ -5,9 +5,9 @@
 
   - if @study_contance
     - total = @enroll_academic_process.total_subjects
-    = "Quien suscribe, Jefe de Control de Estudios de la #{@faculty.name.upcase}, de la Universidad Central de Venezuela, por medio de la presente hace constar que #{@user.la_el} BR. <b>#{@user.reverse_name}</b>, titular de la Cédula de Identidad <b>#{@user.ci}</b> es estudiante regular de la  <b>#{@school.name.upcase}</b> y está cursando en el periodo <b>#{@academic_process.process_name}</b> #{'la'.pluralize(total)} #{'siguiente'.pluralize(total)} #{'asignatura'.pluralize(total)}:".html_safe
+    = "Quien suscribe, Jefe de Control de Estudios de la #{@school.name.upcase}, de la #{@faculty.name}, de la Universidad Central de Venezuela, por medio de la presente hace constar que #{@user.la_el} BR. <b>#{@user.reverse_name}</b>, titular de la Cédula de Identidad <b>#{@user.ci}</b> es estudiante regular de esta escuela y está cursando en el periodo <b>#{@academic_process.process_name}</b> #{'la'.pluralize(total)} #{'siguiente'.pluralize(total)} #{'asignatura'.pluralize(total)}:".html_safe
   - else
-    = "Quien suscribe, Jefe de Control de Estudios de la #{@faculty.name.upcase}, de la Universidad Central de Venezuela, por medio de la presente hace constar que #{@user.la_el} BR. <b>#{@user.reverse_name}</b>, titular de la Cédula de Identidad <b>#{@user.ci}</b> está inscrit#{@user.genero} en la  <b>#{@school.name.upcase}</b> para el período <b>#{@academic_process.process_name}</b> con las siguientes asignaturas:".html_safe
+    = "Quien suscribe, Jefe de Control de Estudios de la #{@school.name.upcase}, de la #{@faculty.name}, de la Universidad Central de Venezuela, por medio de la presente hace constar que #{@user.la_el} BR. <b>#{@user.reverse_name}</b>, titular de la Cédula de Identidad <b>#{@user.ci}</b> está inscrit#{@user.genero} en esta escuela para el período <b>#{@academic_process.process_name}</b> con las siguientes asignaturas:".html_safe
 %br
 %br
 %table.table.table-sm.table-bordered

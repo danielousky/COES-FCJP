@@ -50,7 +50,7 @@ class AcademicProcess < ApplicationRecord
   belongs_to :period
   has_one :period_type, through: :period
 
-  belongs_to :process_before, class_name: 'AcademicProcess', optional: true#, dependent: :destroy
+  belongs_to :process_before, class_name: 'AcademicProcess', optional: true
 
   #has_many:
   has_many :enrollment_days, dependent: :destroy
