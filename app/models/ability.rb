@@ -20,7 +20,8 @@ class Ability
 
       if user.admin.desarrollador?
         can :manage, :all
-
+      elsif GeneralSetup.disable_for_non_payment?
+        can :read, [School]
       elsif user.admin.jefe_control_estudio?
         can :import, Authorizable::IMPORTABLES
         can :manage, [Admin, Student, Teacher, Area, Departament, Subject, SubjectType, Course, Grade, AcademicProcess, AcademicRecord, Section, AdmissionType, PeriodType, Address, StudyPlan, Period, SubjectLink, Schedule, EnrollmentDay, Billboard, User, EnrollAcademicProcess, PaymentReport, Bank, BankAccount, Mention, EnvAuth]

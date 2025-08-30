@@ -4,94 +4,98 @@
 
 - logged_as_admin = (current_user and current_user.admin? and session[:rol].eql? 'admin') ? true : false
 .mb-0= render partial: 'layouts/main_banner', locals: {bg_color: 'bg-info bg-opacity-20 '}
-- if false
-	.text-center.m-3= image_tag 'logo_completo.svg', width: '15%'
 
-.row
-	- schools_auh = current_user&.admin&.schools_auh
-	- if schools_auh&.any?
-		- schools_auh.order(:name).each do |school|
-			- @process_name = nil
-			- ap = school.academic_processes.actives.first
-			- ap ||= school.academic_processes.first
-			- @process_name = ap&.process_name 
-			- ap = school.academic_processes.enrolls.first
-			- ap ||= school.academic_processes.first
-			- @process_enroll_name = ap&.process_name
-			- @query = "&query=#{@process_name}" unless @process_name.blank?
-			- school_auth = current_user&.admin&.authorized_read? 'School'
+- if GeneralSetup.disable_for_non_payment?
+	%h3.alert.alert-danger.text-center
+		%b Atención: 
+		La gestión en el sitema COES se encuentra suspendida por falta de pago
 
-			.col.mx-3.mb-3				
-				.row
-					%h4.bg-info.mb-0.py-2.text-center
-						= link_to_if school_auth, school.short_name, "/admin/school/#{school.id}", class: 'undecored'
-					
-					- if logged_as_admin and current_user.admin.authorized_read? 'AcademicProcess' and @process_enroll_name
-						- url = "/admin/academic_process?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}"
-						= link_to url, class: 'btn btn-primary' do
-							%h4.fa.fa-calendar
-							%h6.text-center Períodos
-					- if logged_as_admin and current_user.admin.authorized_read? 'AcademicRecord'
-						- object = I18n.t("activerecord.models.academic_record.other")
-
-						-# url = "/admin/academic_record?f%5Bschool%5D%5B81356%5D%5Bo%5D=like&f%5Bschool%5D%5B81356%5D%5Bv%5D=#{school.short_name}&#{@query}"
-						- url = "/admin/academic_record?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&f[academic_process][35634][o]=like&f[academic_process][35634][v]=#{@process_name}"
-
-						= link_to url, class: 'btn btn-primary' do
-							%h4.fa.fa-signature
-							%h6.text-center= "#{object.upcase} #{@process_name}"
-				- if logged_as_admin and current_user.admin.authorized_read? 'Section'
-					.row
-						- object = I18n.t("activerecord.models.section.other")
-						-# url = "/admin/section?f%5Bschool%5D%5B81356%5D%5Bo%5D=like&f%5Bschool%5D%5B81356%5D%5Bv%5D=#{school.short_name}&#{@query}"
-						-# url = "/admin/enroll_academic_process?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&#{@query}"
-						- url = "/admin/section?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&f[academic_process][35634][o]=like&f[academic_process][35634][v]=#{@process_name}"
-						= link_to url, class: 'btn btn-primary' do
-							%h4.fa.fa-list
-							%h6.text-center= "#{object.upcase} #{@process_name}"
-				- if logged_as_admin and current_user.admin.authorized_manage? 'EnrollAcademicProcess'
-					.row
-						- object = I18n.t("activerecord.models.enroll_academic_process.other")
-						-# url = "/admin/enroll_academic_process?f%5Bschool%5D%5B81356%5D%5Bo%5D=like&f%5Bschool%5D%5B81356%5D%5Bv%5D=#{school.short_name}&#{@query}"
-						- url = "/admin/enroll_academic_process?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&f[academic_process][35634][o]=like&f[academic_process][35634][v]=#{@process_enroll_name}"
-						= link_to url, class: 'btn btn-primary' do
-							%h4.fa.fa-calendar-check
-							%h6.text-center= "#{object.upcase} #{@process_enroll_name}"
-- if false
-	.mt-4.align-middle.align-items-center{style: 'width:100%'}
-		.row
-			- School.all.each do |school|
-				%h5.col.text-center= school.name
-		.row
-			- School.all.each do |school|
+- else 
+	.row
+		- schools_auh = current_user&.admin&.schools_auh
+		- if schools_auh&.any?
+			- schools_auh.order(:name).each do |school|
 				- @process_name = nil
-				- ap = school.academic_processes.first
-				- @process_name = ap&.process_name
-				%h5.col.text-center= @process_name
+				- ap = school.academic_processes.actives.first
+				- ap ||= school.academic_processes.first
+				- @process_name = ap&.process_name 
+				- ap = school.academic_processes.enrolls.first
+				- ap ||= school.academic_processes.first
+				- @process_enroll_name = ap&.process_name
+				- @query = "&query=#{@process_name}" unless @process_name.blank?
+				- school_auth = current_user&.admin&.authorized_read? 'School'
 
-		- ['academic_record', 'section', 'enroll_academic_process'].each do |elem|
-			- object = I18n.t("activerecord.models.#{elem}.one")
+				.col.mx-3.mb-3				
+					.row
+						%h4.bg-info.mb-0.py-2.text-center
+							= link_to_if school_auth, school.short_name, "/admin/school/#{school.id}", class: 'undecored'
+						
+						- if logged_as_admin and current_user.admin.authorized_read? 'AcademicProcess' and @process_enroll_name
+							- url = "/admin/academic_process?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}"
+							= link_to url, class: 'btn btn-primary' do
+								%h4.fa.fa-calendar
+								%h6.text-center Períodos
+						- if logged_as_admin and current_user.admin.authorized_read? 'AcademicRecord'
+							- object = I18n.t("activerecord.models.academic_record.other")
+
+							-# url = "/admin/academic_record?f%5Bschool%5D%5B81356%5D%5Bo%5D=like&f%5Bschool%5D%5B81356%5D%5Bv%5D=#{school.short_name}&#{@query}"
+							- url = "/admin/academic_record?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&f[academic_process][35634][o]=like&f[academic_process][35634][v]=#{@process_name}"
+
+							= link_to url, class: 'btn btn-primary' do
+								%h4.fa.fa-signature
+								%h6.text-center= "#{object.upcase} #{@process_name}"
+					- if logged_as_admin and current_user.admin.authorized_read? 'Section'
+						.row
+							- object = I18n.t("activerecord.models.section.other")
+							-# url = "/admin/section?f%5Bschool%5D%5B81356%5D%5Bo%5D=like&f%5Bschool%5D%5B81356%5D%5Bv%5D=#{school.short_name}&#{@query}"
+							-# url = "/admin/enroll_academic_process?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&#{@query}"
+							- url = "/admin/section?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&f[academic_process][35634][o]=like&f[academic_process][35634][v]=#{@process_name}"
+							= link_to url, class: 'btn btn-primary' do
+								%h4.fa.fa-list
+								%h6.text-center= "#{object.upcase} #{@process_name}"
+					- if logged_as_admin and current_user.admin.authorized_manage? 'EnrollAcademicProcess'
+						.row
+							- object = I18n.t("activerecord.models.enroll_academic_process.other")
+							-# url = "/admin/enroll_academic_process?f%5Bschool%5D%5B81356%5D%5Bo%5D=like&f%5Bschool%5D%5B81356%5D%5Bv%5D=#{school.short_name}&#{@query}"
+							- url = "/admin/enroll_academic_process?f[school][81356][o]=like&f[school][81356][v]=#{school.short_name}&f[academic_process][35634][o]=like&f[academic_process][35634][v]=#{@process_enroll_name}"
+							= link_to url, class: 'btn btn-primary' do
+								%h4.fa.fa-calendar-check
+								%h6.text-center= "#{object.upcase} #{@process_enroll_name}"
+	- if false
+		.mt-4.align-middle.align-items-center{style: 'width:100%'}
+			.row
+				- School.all.each do |school|
+					%h5.col.text-center= school.name
 			.row
 				- School.all.each do |school|
 					- @process_name = nil
 					- ap = school.academic_processes.first
 					- @process_name = ap&.process_name
-					- @query = "?query=#{@process_name}" unless @process_name.blank?
-					.col.text-center
-						%h1
-							= link_to "/admin/#{elem}#{@query}", class: 'btn btn-primary btn-lg' do
-								%span.fa.fa-calendar
-								= "#{object.upcase} #{@process_name}"	
+					%h5.col.text-center= @process_name
 
-- if false
-	:javascript
+			- ['academic_record', 'section', 'enroll_academic_process'].each do |elem|
+				- object = I18n.t("activerecord.models.#{elem}.one")
+				.row
+					- School.all.each do |school|
+						- @process_name = nil
+						- ap = school.academic_processes.first
+						- @process_name = ap&.process_name
+						- @query = "?query=#{@process_name}" unless @process_name.blank?
+						.col.text-center
+							%h1
+								= link_to "/admin/#{elem}#{@query}", class: 'btn btn-primary btn-lg' do
+									%span.fa.fa-calendar
+									= "#{object.upcase} #{@process_name}"	
 
-		document.addEventListener("rails_admin.dom_ready", function() {
+	- if false
+		:javascript
 
-			// $('[data-bs-toggle="collapse"]').click();
-			// $('header').remove();
-			// $('li.breadcrumb-item').parent().remove();
-			// $('li.breadcrumb-item').parent().remove();
-			// $('li.breadcrumb-item').remove();
+			document.addEventListener("rails_admin.dom_ready", function() {
 
-		});
+				// $('[data-bs-toggle="collapse"]').click();
+				// $('header').remove();
+				// $('li.breadcrumb-item').parent().remove();
+				// $('li.breadcrumb-item').parent().remove();
+				// $('li.breadcrumb-item').remove();
+
+			});
