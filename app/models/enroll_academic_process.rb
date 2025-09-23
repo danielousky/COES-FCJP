@@ -200,10 +200,10 @@ class EnrollAcademicProcess < ApplicationRecord
                                    .where.not('academic_records.status': 3)
     
     # Get timeblocks from the provided timetable
-    timetable_timeblocks = timetable.timeblocks
+    timetable_timeblocks = timetable&.timeblocks
     
     # Compare each timeblock from the timetable with enroll timeblocks
-    timetable_timeblocks.each do |timetable_block|
+    timetable_timeblocks&.each do |timetable_block|
       enroll_timeblocks.where(day: timetable_block.day).each do |enroll_block|
         # Check if there's overlap in time
         if ((enroll_block.start_time&.to_i < timetable_block.end_time&.to_i) and 
