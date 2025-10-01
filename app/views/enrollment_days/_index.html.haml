@@ -1,6 +1,6 @@
 - logged_as_admin = (current_user&.admin? and session[:rol].eql? 'admin') ? true : false
 - enrollment_days = academic_process.enrollment_days
-- grades_without_appointment = academic_process.grades_ready_to_enrollment_day
+-# grades_without_appointment = academic_process.grades_ready_to_enrollment_day
 
 - grades_without_appointment = academic_process.school.grades.valid_to_enrolls(academic_process.id,academic_process.process_before.id)
 

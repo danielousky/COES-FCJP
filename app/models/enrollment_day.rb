@@ -55,6 +55,12 @@ class EnrollmentDay < ApplicationRecord
     "#{academic_process.school.code}_#{academic_process.process_name}_#{start.strftime('%Y%m%d')}_#{self.id}"
   end
 
+
+
+
+
+
+  
   def own_grades_to_csv
 
     CSV.generate do |csv|
@@ -62,7 +68,9 @@ class EnrollmentDay < ApplicationRecord
       own_grades_sort_by_appointment.each do |grade|
         user = grade.user
         if self.by_before_process
-          obj = grade.enroll_academic_processes.joins(:period).order(['periods.year': :desc, 'periods.period_type_id': :desc]).first
+          academic_process = self.academic_process.process_before
+          obj = grade.enroll_academic_processes.where(academic_process_id: academic_process.id).first if academic_process.present?
+          obj ||= grade
         else
           obj = grade
         end

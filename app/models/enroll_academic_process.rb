@@ -24,7 +24,7 @@
 #  fk_rails_...  (grade_id => grades.id)
 #
 class EnrollAcademicProcess < ApplicationRecord
-
+  include Numerizable
   # HISTORY:
   has_paper_trail on: [:create, :destroy, :update]
 
@@ -62,7 +62,7 @@ class EnrollAcademicProcess < ApplicationRecord
   # ENUMERIZE:
   # IDEA CON ESTADO DE INSCRIPCIÓN EN GRADE Y ENROLL ACADEMIC PROCESS
   enum enroll_status: [:preinscrito, :reservado, :confirmado]
-  enum permanence_status: [:nuevo, :regular, :reincorporado, :articulo3, :articulo6, :articulo7, :intercambio, :desertor, :egresado, :egresado_doble_titulo, :permiso_para_no_cursar, :retiro_total, :por_calificar]  
+  enum permanence_status: PERMANENCE_STATUSES
 
   # VALIDATIONS:
   validates :grade, presence: true
@@ -162,7 +162,7 @@ class EnrollAcademicProcess < ApplicationRecord
   
   # Scope que devuelve los procesos de inscripción académica que tienen registros académicos
   # y que todos esos registros están en estado 'retirado' (status = 3)
-  scope :retiro_total, -> {where(id: full_retired.ids)}
+  scope :retiro_periodo, -> {where(id: full_retired.ids)}
   
   scope :full_retired, -> {
     joins(:academic_records)
@@ -242,14 +242,16 @@ class EnrollAcademicProcess < ApplicationRecord
     get_regulation
   end
   def get_regulation
-    if permiso_para_no_cursar?
-      reglamento_aux = :permiso_para_no_cursar
+    if PERMANENCE_STATUSES_SETEABLES.include? self.permanence_status&.to_sym
+      return self.permanence_status.to_sym
     else
       reglamento_aux = :regular
       if !(self.grade.academic_records.qualified.any?)
         reglamento_aux = :nuevo
       elsif total_retire?
-        reglamento_aux = :retiro_total
+        reglamento_aux = :retiro_periodo
+      elsif self.academic_records.sin_calificar.any?
+        reglamento_aux = :por_calificar
       elsif self.academic_records.sin_calificar.any?
         reglamento_aux = :por_calificar
       elsif self.academic_records.coursed.any?
@@ -402,20 +404,6 @@ class EnrollAcademicProcess < ApplicationRecord
     return aux
   end
 
-  def label_permanence_status
-    # [:nuevo, :regular, :reincorporado, :articulo3, :articulo6, :articulo7, :intercambio, :desertor, :egresado, :egresado_doble_titulo]  
-    label_color = 'info'
-    case self.permanence_status
-    when 'articulo3'
-      label_color = 'warning'
-    when 'articulo6'
-      label_color = 'danger'
-    when 'articulo7'
-      label_color = 'dark'
-    end
-    return ApplicationController.helpers.label_status("bg-#{label_color}", self.permanence_status&.titleize)
-  end
-
   def region
     grade&.region&.titleize
   end
@@ -454,7 +442,7 @@ class EnrollAcademicProcess < ApplicationRecord
 
     list do
       search_by :custom_search
-      scopes [:todos, :preinscrito, :reservado, :confirmado, :retiro_total, :con_reporte_de_pago, :sin_reporte_de_pago, :sin_inscripciones]
+      scopes [:todos, :preinscrito, :reservado, :confirmado, :retiro_periodo, :con_reporte_de_pago, :sin_reporte_de_pago, :sin_inscripciones]
             
       field :school do
         sticky true 
@@ -586,63 +574,6 @@ class EnrollAcademicProcess < ApplicationRecord
   def is_the_last_enroll_of_grade?
     self.grade.last_enrolled.eql? self
   end
-
-
-  def total_credits_coursed
-    academic_records.total_credits_coursed
-  end
-
-  def total_credits_approved
-    academic_records.total_credits_approved
-  end
-
-  def efficiency_desc
-    if efficiency.nil?
-      '--'
-    else
-      (efficiency).round(2)
-    end
-  end
-
-  def simple_average_desc
-    if simple_average.nil?
-      '--'
-    else
-      (simple_average).round(2)
-    end
-  end
-
-  def weighted_average_desc
-    if weighted_average.nil?
-      '--'
-    else
-      (weighted_average).round(2)
-    end
-  end
-
-  def calculate_efficiency
-    cursados = self.total_subjects_coursed
-    aprobados = self.total_subjects_approved
-    if cursados < 0 or aprobados < 0
-      0.0
-    elsif cursados == 0 or (cursados > 0 and aprobados >= cursados)
-      1.0
-    else
-      (aprobados.to_f/cursados.to_f).round(4)
-    end
-  end
-
-  def calculate_average
-    aux = academic_records.promedio
-    (aux&.is_a? BigDecimal) ? aux.to_f.round(4) : self.simple_average
-  end
-
-  def calculate_weighted_average 
-    aux = academic_records.weighted_average
-    cursados = self.total_credits_coursed
-    (cursados > 0 and aux) ? (aux.to_f/cursados.to_f).round(4) : self.weighted_average
-  end
-
 
   private
 

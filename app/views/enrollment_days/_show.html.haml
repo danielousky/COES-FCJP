@@ -29,7 +29,7 @@
           %td{'data-bs-toggle': :tooltip, title: reverse_name}= link_to reverse_name, "/admin/student/#{grade.student_id}", target: '_black'
           %td.text-center= grade.appointment_from 
           %td.text-center= grade.appointment_to
-          %td.text-center.align-middle= grade.label_current_permanence_status
+          %td.text-center.align-middle= grade.label_permanence_status
           %td= obj.efficiency
           %td= obj.simple_average
           %td= obj.weighted_average

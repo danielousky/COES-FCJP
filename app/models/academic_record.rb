@@ -105,6 +105,8 @@ class AcademicRecord < ApplicationRecord
 
   scope :on_reparacion, -> {joins(:qualifications).where('qualificactions.type_q': :reparacion)}
 
+  scope :numerica, -> {joins(:subject).where('subjects.qualification_type': Subject.qualification_types[:numerica])}
+
   scope :of_school, -> (school_id) {includes(:school).where("schools.id = ?", school_id).references(:schools)}
   scope :of_schools, -> (school_id) {includes(:school).where("schools.id IN (?)", schools_ids).references(:schools)}
 
@@ -141,6 +143,7 @@ class AcademicRecord < ApplicationRecord
   # Sections modalities: {nota_final: 0, equivalencia_externa: 1, equivalencia_interna: 2, suficiencia: 3}
   scope :section_equivalencias, -> {joins(:section).where('sections.modality': [:equivalencia_externa, :equivalencia_interna])}
   scope :section_not_equivalencias, -> {joins(:section).where('sections.modality': [:nota_final, :suficiencia])}
+  scope :not_equivalencia, -> {section_not_equivalencias}
 
   scope :total_subjects_coursed, -> {coursed.total_subjects}
   scope :total_subjects_approved, -> {aprobado.total_subjects}
@@ -155,12 +158,26 @@ class AcademicRecord < ApplicationRecord
   scope :total_credits_approved_not_equivalence, -> {section_not_equivalencias.total_credits_approved}  
 
   scope :total_credits_equivalence, -> {section_equivalencias.total_credits}
+  scope :total_credits_not_equivalence, -> {not_equivalencia.total_credits}
+
+  scope :total_credits_coursed_not_equivalence, -> {not_equivalencia.total_credits_coursed}
+  scope :total_credits_coursed_not_equivalence_numeric, -> {numerica.total_credits_coursed_not_equivalence}
   
-  scope :weighted_average, -> {joins(:subject).joins(:qualifications).definitives.coursed.sum('subjects.unit_credits * qualifications.value')}
+  scope :total_credits_approved, -> {aprobado.total_credits}
+  scope :total_credits_approved_equivalence, -> {numerica.equivalencia.total_credits_approved}
+
+  scope :weighted_average, -> {joins(:subject).numerica.joins(:qualifications).not_equivalencia.definitives.coursed.sum('subjects.unit_credits * qualifications.value')}
+
+
+  scope :total_credits_approved_not_equivalence, -> {not_equivalencia.total_credits_approved}
+
+  scope :total_credits_approved_not_equivalence_numeric, -> {numerica.total_credits_approved_not_equivalence} 
+  scope :total_credits_coursed_not_equivalence_numeric, -> {numerica.total_credits_coursed_not_equivalence}
+
 
   scope :definitives, -> {joins(:qualifications).where('qualifications.definitive': true)}
 
-  scope :promedio, -> {joins(:qualifications).coursed.definitives.average('qualifications.value')}
+  scope :promedio, -> {joins(:qualifications).numerica.coursed.not_equivalencia.definitives.average('qualifications.value')}
   scope :promedio_approved, -> {aprobado.promedio}
   scope :weighted_average_approved, -> {aprobado.weighted_average}
 

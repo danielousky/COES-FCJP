@@ -17,7 +17,7 @@
 			%td.text-center= @grade.label_admission_type
 			%td.text-center= @grade.label_registration_status
 			%td.text-center{'data-bs-toggle': :tooltip, title: 'Estado de la Carrera'}= @grade.label_graduate_status
-			%td.text-center{'data-bs-toggle': :tooltip, title: 'Régimen Actual de Permanencia'}= @grade.label_current_permanence_status
+			%td.text-center{'data-bs-toggle': :tooltip, title: 'Régimen Actual de Permanencia'}= @grade.label_permanence_status
 			- if @grade&.school&.have_language_combination?
 				%td.text-center
 					= @grade.label_languages

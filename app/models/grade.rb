@@ -45,6 +45,7 @@
 #  fk_rails_...  (study_plan_id => study_plans.id)
 #
 class Grade < ApplicationRecord
+  include Numerizable
   has_paper_trail on: [:create, :destroy, :update], limit: nil
 
   before_create :paper_trail_create
@@ -85,7 +86,7 @@ class Grade < ApplicationRecord
   enum registration_status: {pendiente: 0, secretaria: 1, facultad: 2, escuela: 3}
   enum enrollment_status: {preinscrito: 0, asignado: 1, confirmado: 2}
   enum graduate_status: {cursante: 0, tesista: 1, posible_graduando: 2, graduando: 3, graduado: 4, postgrado: 5}
-  enum current_permanence_status: {nuevo: 0, regular: 1, reincorporado: 2, articulo3: 3, articulo6: 4, articulo7: 5, intercambio: 6, desertor: 7, egresado: 8, egresado_doble_titulo: 8, permiso_para_no_cursar: 9, retiro_total: 10, por_calificar: 11}
+  enum current_permanence_status: PERMANENCE_STATUSES
   enum region: {no_aplica: 0, amazonas: 1, barcelona: 2, barquisimeto: 3, bolivar: 4, capital: 5}
 
 
@@ -129,7 +130,7 @@ class Grade < ApplicationRecord
 
   scope :current_permanence_valid_to_enroll, -> {where('grades.current_permanence_status': [:regular, :reincorporado, :articulo3])}
 
-  scope :others_permanence_invalid_to_enroll, -> {where(current_permanence_status: [:nuevo, :articulo6, :articulo7, :intercambio, :desertor, :egresado, :egresado_doble_titulo, :permiso_para_no_cursar, :por_calificar])}
+  scope :others_permanence_invalid_to_enroll, -> {where(current_permanence_status: Numerizable::PERMANENCE_STATUSES - [:regular, :reincorporado, :articulo3])}
 
   scope :special_authorized, -> (academic_process_id) {where(enabled_enroll_process_id:academic_process_id )}
 
@@ -357,9 +358,7 @@ class Grade < ApplicationRecord
       return true
     else
       academic_process_before = academic_process&.process_before
-      if self.nuevo?
-        return true
-      elsif (academic_process_before and self.enroll_academic_processes.of_academic_process(academic_process_before.id).any?) and (['regular', 'reincorporado', 'articulo3'].include? self.current_permanence_status)
+      if (academic_process_before and self.enroll_academic_processes.of_academic_process(academic_process_before.id).any?) and (['regular', 'reincorporado', 'articulo3', 'retiro_periodo'].include? self.current_permanence_status)
         return true
       end
     end
@@ -432,19 +431,6 @@ class Grade < ApplicationRecord
       aux += " | duración: #{duration_slot_time} minutos" if duration_slot_time
       return aux
     end
-  end
-
-  def label_current_permanence_status
-    # [:nuevo, :regular, :reincorporado, :articulo3, :articulo6, :articulo7, :intercambio, :desertor, :egresado, :egresado_doble_titulo]
-    if self.nuevo? or self.regular? or self.reincorporado? or self.intercambio? or self.egresado? or self.egresado_doble_titulo?
-      label = 'bg-info'
-    elsif self.articulo3?
-      label = 'bg-warning'
-    else 
-      label = 'bg-danger'
-    end
-
-    ApplicationController.helpers.label_status(label, current_permanence_status.titleize)
   end
 
   def label_languages
@@ -678,19 +664,6 @@ class Grade < ApplicationRecord
 
   # NUMBERSTINY:
 
-  def numbers
-    "Efi: #{efficiency}, Prom. Ponderado: #{weighted_average}, Prom. Simple: #{simple_average}"
-    # redear una tabla descripción. OJO Sí es posible estandarizar
-  end
-
-  def academic_records_from_subjects_approved
-    self.academic_records.aprobado.joins(:subject)
-  end
-
-  def subjects_approved_ids
-    self.academic_records.aprobado.joins(:subject).select('subjects.id').map{|su| su.id}
-  end
-
   # TOTALS CREDITS:
 
   def credits_completed_by_type tipo
@@ -699,22 +672,6 @@ class Grade < ApplicationRecord
 
   def total_credits
     self.academic_records.total_credits
-  end
-
-  def total_credits_coursed process_ids = nil
-    if process_ids
-      academic_records.total_credits_coursed_on_process process_ids
-    else
-      academic_records.total_credits_coursed
-    end
-  end
-
-  def total_credits_approved process_ids = nil
-    if process_ids
-      academic_records.total_credits_approved_on_process process_ids
-    else
-      academic_records.total_credits_approved
-    end
   end
 
   # TOMAR EN CUENTA QUE LOS CREDITOS O ASIGNATURAS REGISTRADAS PRO EQUIVALENCIA DEBEN SER APROBADAS
@@ -748,26 +705,6 @@ class Grade < ApplicationRecord
   #   self.academic_records.aprobado.joins(:subject, :section).equivalencia.sum('subjects.unit_credits')
   # end
 
-  # TOTALS SUBJECTS:
-  def total_subjects_coursed
-    academic_records.total_subjects_coursed
-  end
-
-  def total_subjects_approved
-    academic_records.total_subjects_approved
-  end
-
-  def total_subjects_eq
-    academic_records.total_subjects_equivalence
-  end  
-
-  def total_subjects_approved_without_eq
-    academic_records.total_subjects_approved_not_equivalence
-  end  
-
-  def total_subjects_retiradas
-    academic_records.retirado.total_subjects
-  end
 
   def update_all_efficiency
 
@@ -788,18 +725,6 @@ class Grade < ApplicationRecord
 
   end
 
-  def calculate_efficiency periods_ids = nil 
-    cursados = self.total_subjects_coursed
-    aprobados = self.total_subjects_approved
-    if cursados < 0 or aprobados < 0
-      0.0
-    elsif cursados == 0 or (cursados > 0 and aprobados >= cursados)
-      1.0
-    else
-      (aprobados.to_f/cursados.to_f).round(4)
-    end
-  end
-
   def calculate_average periods_ids = nil
     if periods_ids
       aux = academic_records.of_periods(periods_ids).promedio
@@ -809,30 +734,6 @@ class Grade < ApplicationRecord
 
     (aux and aux.is_a? BigDecimal) ? aux.to_f.round(4) : 0.0
 
-  end
-
-  def calculate_weighted_average periods_ids = nil
-    if periods_ids
-      aux = academic_records.of_periods(periods_ids).weighted_average
-    else
-      aux = academic_records.weighted_average
-    end
-    cursados = self.total_credits_coursed periods_ids
-
-    (cursados > 0 and aux) ? (aux.to_f/cursados.to_f).round(4) : 0.0
-  end
-
-  def calculate_weighted_average_approved
-
-    aprobados = self.academic_records.total_credits_approved
-    aux = self.academic_records.weighted_average_approved
-    ((aprobados > 0) and aux&.is_a? Integer) ? (aux.to_f/aprobados.to_f).round(4) : 0.0
-    
-  end
-
-  def calculate_average_approved
-    aux = self.academic_records.promedio_approved
-    (aux and aux.is_a? BigDecimal) ? aux.round(4) : 0.0
   end
 
   def get_changed_plain
